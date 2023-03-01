@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/viewContainer"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:padding="11dp"
+    android:background="@drawable/round_style"
+    android:backgroundTint="#E5EDE7"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/toastImage"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/baseline_devices_24">
+    </ImageView>
+
+    <TextView
+        android:id="@+id/toastMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Test Message"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:layout_marginLeft="11dp"/>
+
+</LinearLayout>
