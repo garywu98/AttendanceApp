@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">AttendanceApp</string>
+    <string name="bluetooth_search_devices">Search Devices</string>
+    <string name="bluetooth_enable">Turn on Bluetooth</string>
+    <string name="bluetooth_enable_message">Bluetooth is required for this app. Please allow bluetooth on this device.</string>
+    <string name="bluetooth_not_supported">Bluetooth is not supported on this phone. Please run this app on another device.</string>
 </resources>
