@@ -1,8 +1,11 @@
 package com.example.attendanceapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -11,9 +14,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter;
     private Set<BluetoothDevice> pairedDevices;
     private List<String> discoveredDevicesAdapter;
+    String[] permission = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +42,75 @@ public class MainActivity extends AppCompatActivity {
 //
 //        }
 
+        checkAndRequestPermissions();
+
+        super.onRequestPermissionsResult(225, permission, new int[2]);
+//        Log.d("perm ", String.valueOf(listPermissionsNeeded.size()));
+//
+//        for(String perm : listPermissionsNeeded) {
+//            Log.d("perm ", perm);
+//        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
+
+    public static int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 225: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Permission Granted..", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, permission[0], Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Permission Denied..", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_main);
+//        if(checkAndRequestPermissions()) {
+//            // carry on the normal flow, as the case of  permissions  granted.
+//        }
+//    }
+
+    private boolean checkAndRequestPermissions() {
+//        int permissionBluetoothScan = ContextCompat.checkSelfPermission(this,
+//                android.Manifest.permission.BLUETOOTH_SCAN);
+        int permissionBluetoothConnect = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+            if (permissionBluetoothConnect != PackageManager.PERMISSION_GRANTED) {
+
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    Log.d("shouldShowRequestPermissionRationale ", "here");
+//                showExplanation("Permission Needed", "Rationale", Manifest.permission.READ_PHONE_STATE, REQUEST_PERMISSION_PHONE_STATE);
+                } else {
+                    Log.d("shouldShowRequestPermissionRationale else ", "here");
+
+                    ActivityCompat.requestPermissions(this, permission, 225);
+
+
+                }
+//                listPermissionsNeeded.add(android.Manifest.permission.BLUETOOTH_CONNECT);
+            }
+
+//        if (permissionBluetoothScan != PackageManager.PERMISSION_GRANTED) {
+//            listPermissionsNeeded.add(android.Manifest.permission.BLUETOOTH_SCAN);
+//        }
+//        if (!listPermissionsNeeded.isEmpty()) {
+//            Log.d("checkAndRequestPermissions ", "here");
+//            requestPermissions(listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), 1);
+//
+//            return false;
+//        }
+        return true;
     }
 
     @Override
@@ -60,7 +133,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                     //no permission to connect to bluetooth
-                    //return;
+                    Log.d("Bluetooth Connect", " denied");
+//                    return;
                 }
 
                 startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
@@ -109,10 +183,16 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    @SuppressLint("MissingPermission")
+
+    //    @SuppressLint("MissingPermission")
     public void discoverDevices() {
         Log.d("discoverDevices ", "invoked");
 
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("discoverDevices ", "here 2");
+            return;
+        }
         if (mBluetoothAdapter.isDiscovering()) {
             mBluetoothAdapter.cancelDiscovery();
         }
