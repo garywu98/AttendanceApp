@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // custom toast will show up when clicking on the devices button
             case R.id.menu_search_devices:
-                showCustomToast("Student not found in class list", R.drawable.baseline_check_circle_24);
+                showCustomToast("Test message!", R.drawable.baseline_check_circle_24);
                 return true;
             case R.id.menu_enable_bluetooth:
                 return true;
@@ -87,9 +87,6 @@ public class MainActivity extends AppCompatActivity {
         if(bluetoothAdapter == null) {
             TextView message = (TextView) findViewById(R.id.message);
             message.setText(R.string.bluetooth_not_supported);
-//            Toast toast = Toast.makeText(getApplicationContext(), "Hello World!", Toast.LENGTH_LONG);
-//            toast.show();
-
         }
         else if(!bluetoothAdapter.isEnabled()) {
             TextView message = (TextView) findViewById(R.id.message);
