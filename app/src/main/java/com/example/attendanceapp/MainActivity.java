@@ -3,15 +3,16 @@ package com.example.attendanceapp;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
-import android.bluetooth.BluetoothAdapter;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
+import android.text.SpannableStringBuilder;
+import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,8 +30,6 @@ import android.widget.Toast;
     NetID: lmv180001, yxy190022
  */
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -38,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothUtils bluetoothUtils;
     private Permissions perm;
     Button showDevicesBtn;
+
+    // intent value for enabling bluetooth
+    int REQUEST_ENABLE_BT = 1;
 
     @Override
     /*
@@ -58,13 +60,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Handles action when the user presses one of the buttons on the menu bar
+    @SuppressLint("MissingPermission")
     public boolean onOptionsItemSelected(MenuItem item) {
+        TextView textView = (TextView) findViewById((R.id.message));
+
         switch (item.getItemId()) {
-            // custom toast will show up when clicking on the devices button
+            // brings up a listview of all available devices to connect to
             case R.id.menu_search_devices:
-                showCustomToast("Test message!", R.drawable.baseline_check_circle_24);
+//                FragmentManager fm = getSupportFragmentManager();
+//                BluetoothFragment fragment = new BluetoothFragment();
+//                fm.beginTransaction().add(R.id.main_activity_container,fragment).commit();
+                discoverDevices();
+                // showCustomToast("Test message!", R.drawable.baseline_check_circle_24);
                 return true;
             case R.id.menu_enable_bluetooth:
+                if (!mBluetoothAdapter.isEnabled()) {
+                    //if bluetooth is not enabled, enable it
+                    textView.setText(R.string.bluetooth_enable_message);
+                    Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+
+                    startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+                    Log.d("Bluetooth ", " is now turned on");
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -97,23 +114,38 @@ public class MainActivity extends AppCompatActivity {
         bluetoothUtils = new BluetoothUtils(mBluetoothAdapter);
         perm = new Permissions(getApplicationInfo().targetSdkVersion);
 
+        TextView textView = (TextView) findViewById((R.id.message));
+
+
         if (mBluetoothAdapter == null) {
             //If bluetooth is not supported
+
             Log.d("Bluetooth ", " is not supported on this device");
+            textView.setText(R.string.bluetooth_not_supported);
             finish();
         } else {
-            int REQUEST_ENABLE_BT = 1;
-
             Log.d("Bluetooth ", " turning on");
 
             if (!mBluetoothAdapter.isEnabled()) {
                 //if bluetooth is not enabled, enable it
-                Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-
-                startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-                Log.d("Bluetooth ", " is now turned on");
+                textView.setText(R.string.bluetooth_enable_message);
             }
+            else {
+                SpannableStringBuilder ssb = new SpannableStringBuilder();
+                ssb.append(getString(R.string.devices_btn_prompt_1));
+                ssb.setSpan(
+                        new ImageSpan(this, R.drawable.baseline_devices_24),
+                        ssb.length() - 1,
+                        ssb.length(),
+                        0
+                );
+                ssb.append(getString(R.string.devices_btn_prompt_2));
+                textView.setText(ssb);
+            }
+
         }
+
+
 
         if(perm != null) perm.checkAndRequestPermissions(this);
         else {
@@ -124,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
     }
 
-    public void discoverDevices(View view) {
+    public void discoverDevices() {
         bluetoothUtils.discoverDevices(this);
     }
 
@@ -137,6 +169,30 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, permissions[i], Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Permission Denied..", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    // checking if the bluetooth enable was granted or denied by the user
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        TextView textView = (TextView) findViewById((R.id.message));
+
+        if(requestCode == REQUEST_ENABLE_BT){
+            if(resultCode == RESULT_OK){
+                //bluetooth was turned on
+                SpannableStringBuilder ssb = new SpannableStringBuilder();
+                ssb.append(getString(R.string.devices_btn_prompt_1));
+                ssb.setSpan(
+                        new ImageSpan(this, R.drawable.baseline_devices_24),
+                        ssb.length() - 1,
+                        ssb.length(),
+                        0
+                );
+                ssb.append(getString(R.string.devices_btn_prompt_2));
+                textView.setText(ssb);
+            }else{
+                //bluetooth was not successfully turned on
             }
         }
     }

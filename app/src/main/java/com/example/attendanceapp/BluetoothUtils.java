@@ -13,8 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BluetoothUtils {
-    private BluetoothAdapter mBluetoothAdapter;
+        private BluetoothAdapter mBluetoothAdapter;
     private List<String> discoveredDevicesAdapter;
+    // holds the discoverable devices
+    private ArrayList<String> discoverableDeviceList = new ArrayList<>();
+
 
     BluetoothUtils(BluetoothAdapter mBluetoothAdapter) {
         this.mBluetoothAdapter = mBluetoothAdapter;
