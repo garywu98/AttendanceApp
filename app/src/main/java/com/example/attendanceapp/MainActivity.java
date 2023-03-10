@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         bluetoothUtils = new BluetoothUtils(mBluetoothAdapter);
+        bluetoothUtils.setMainActivity(this);
         perm = new Permissions(getApplicationInfo().targetSdkVersion);
 
         TextView textView = (TextView) findViewById((R.id.message));

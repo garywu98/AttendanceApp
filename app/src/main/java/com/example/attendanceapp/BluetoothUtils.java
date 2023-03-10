@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
+import androidx.fragment.app.FragmentManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,10 +19,15 @@ public class BluetoothUtils {
     private List<String> discoveredDevicesAdapter;
     // holds the discoverable devices
     private ArrayList<String> discoverableDeviceList = new ArrayList<>();
+    MainActivity main = null;
 
 
     BluetoothUtils(BluetoothAdapter mBluetoothAdapter) {
         this.mBluetoothAdapter = mBluetoothAdapter;
+    }
+
+    public void setMainActivity(MainActivity main) {
+        this.main = main;
     }
 
     @SuppressLint("MissingPermission")
@@ -57,6 +64,10 @@ public class BluetoothUtils {
             for(String device : discoveredDevicesAdapter) {
                 System.out.println(device);
             }
+
+            FragmentManager fm = main.getSupportFragmentManager();
+            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter);
+            fm.beginTransaction().add(R.id.main_activity_container,fragment).commit();
         }
     };
 
