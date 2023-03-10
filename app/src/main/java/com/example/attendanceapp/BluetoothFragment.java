@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 
 import com.example.attendanceapp.placeholder.PlaceholderContent;
 
+import java.util.List;
+
 /**
  * A fragment representing a list of Items.
  */
@@ -23,18 +25,20 @@ public class BluetoothFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
+    private static List<String> devices;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public BluetoothFragment() {
+    public BluetoothFragment(List<String> devices) {
+        this.devices = devices;
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static BluetoothFragment newInstance(int columnCount) {
-        BluetoothFragment fragment = new BluetoothFragment();
+        BluetoothFragment fragment = new BluetoothFragment(devices);
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -64,7 +68,7 @@ public class BluetoothFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new DeviceListRecyclerViewAdapter(PlaceholderContent.ITEMS));
+            recyclerView.setAdapter(new DeviceListRecyclerViewAdapter(devices));
         }
         return view;
     }

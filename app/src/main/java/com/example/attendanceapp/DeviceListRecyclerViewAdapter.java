@@ -3,7 +3,6 @@ package com.example.attendanceapp;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -18,9 +17,9 @@ import java.util.List;
  */
 public class DeviceListRecyclerViewAdapter extends RecyclerView.Adapter<DeviceListRecyclerViewAdapter.ViewHolder> {
 
-    private final List<PlaceholderItem> mValues;
+    private final List<String> mValues;
 
-    public DeviceListRecyclerViewAdapter(List<PlaceholderItem> items) {
+    public DeviceListRecyclerViewAdapter(List<String> items) {
         mValues = items;
     }
 
@@ -34,8 +33,8 @@ public class DeviceListRecyclerViewAdapter extends RecyclerView.Adapter<DeviceLi
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        holder.mIdView.setText(mValues.get(position));
+//        holder.mContentView.setText(mValues.get(position).content);
     }
 
     @Override
@@ -46,7 +45,7 @@ public class DeviceListRecyclerViewAdapter extends RecyclerView.Adapter<DeviceLi
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView mIdView;
         public final TextView mContentView;
-        public PlaceholderItem mItem;
+        public String mItem;
 
         public ViewHolder(FragmentBluetoothBinding binding) {
             super(binding.getRoot());
