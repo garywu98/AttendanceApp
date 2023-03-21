@@ -90,6 +90,7 @@ public class BluetoothThread extends Thread {
         } catch (IOException connectException) {
             // Unable to connect; close the socket and return.
             try {
+                Log.d("Could not connect ", "BluetoothThread");
                 bluetoothSocket.close();
             } catch (IOException closeException) {
                 Log.e(TAG, "Could not close the client socket", closeException);
@@ -99,6 +100,7 @@ public class BluetoothThread extends Thread {
 
         while(true) {
             try {
+                Log.d("Listening ", "BluetoothThread");
                 numBytes = inputStream.read(streamBuffer);
                 Message readMsg = handler.obtainMessage(MessageConstants.MESSAGE_READ, numBytes, -1,
                                                         streamBuffer);

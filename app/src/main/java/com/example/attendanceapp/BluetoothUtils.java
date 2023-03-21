@@ -71,7 +71,7 @@ public class BluetoothUtils {
             }
 
             FragmentManager fm = main.getSupportFragmentManager();
-            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter);
+            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter, mBluetoothAdapter);
             fm.beginTransaction().add(R.id.main_activity_container,fragment).commit();
 
         }
@@ -102,7 +102,7 @@ public class BluetoothUtils {
             activity.registerReceiver(discoveryFinishReceiver, filter);
         }
 
-        createBluetoothThread();
+//        createBluetoothThread();
     }
 
     public void createBluetoothThread() {
