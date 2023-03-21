@@ -28,7 +28,7 @@ public class BluetoothThread extends Thread {
     private final BluetoothDevice bluetoothDevice;
     private final BluetoothAdapter bluetoothAdapter;
     private final String TAG = "BluetoothThread";
-    private final UUID ATTEND_UUID;
+    private final UUID ATTEND_UUID = UUID.fromString("950c98f4-42ae-4618-874c-86eb1544e341");
     private final InputStream inputStream;
     private final OutputStream outputStream;
     private byte[] streamBuffer;
@@ -42,11 +42,10 @@ public class BluetoothThread extends Thread {
     }
 
     @SuppressWarnings("MissingPermission")
-    public BluetoothThread(BluetoothDevice device, BluetoothAdapter adapter, UUID uuid,
-                           Handler handler) {
+    public BluetoothThread(BluetoothDevice device, BluetoothAdapter adapter, Handler handler) {
         bluetoothAdapter = adapter;
         bluetoothDevice = device;
-        ATTEND_UUID = uuid;
+
         BluetoothSocket tempSocket = null;
         InputStream tempInputStream = null;
         OutputStream tempOutputStream = null;
