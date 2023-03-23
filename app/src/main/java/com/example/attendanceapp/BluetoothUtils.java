@@ -75,6 +75,8 @@ public class BluetoothUtils {
             FragmentTransaction ft = fm.beginTransaction();
             // add to stack so we can get back to main activity from the fragment
             ft.addToBackStack("bluetoothFragment");
+            int backStackEntryCount = fm.getBackStackEntryCount();
+            Log.d("fragmentStack", String.valueOf(backStackEntryCount));
             ft.add(R.id.main_activity_container,fragment).commit();
         }
     };

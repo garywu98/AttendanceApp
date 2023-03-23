@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -78,9 +79,11 @@ public class BluetoothFragment extends Fragment {
         switch (item.getItemId()) {
             // moves back to the main activity
             case android.R.id.home:
-//                FragmentManager fm = getActivity().getSupportFragmentManager();
-//                fm.beginTransaction().remove(fm.findFragmentById(R.id.list));
-//                fm.popBackStack();
+//                FragmentManager fm = requireActivity().getSupportFragmentManager();
+//                fm.beginTransaction().remove(Objects.requireNonNull(fm.findFragmentById(R.id.main_activity_container))).commit();
+//                fm.popBackStackImmediate();
+//                Log.d("fragmentPop", String.valueOf(fm.getBackStackEntryCount()));
+
 //                requireActivity().setTitle(getString(R.string.app_name));
 
                 // showCustomToast("Test message!", R.drawable.baseline_check_circle_24);
