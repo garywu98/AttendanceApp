@@ -3,7 +3,10 @@ package com.example.attendanceapp;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
@@ -33,6 +36,8 @@ import android.util.Log;
 
 
 public class MainActivity extends AppCompatActivity {
+
+
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothUtils bluetoothUtils;
     private Permissions perm;
@@ -59,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+
     // Handles action when the user presses one of the buttons on the menu bar
     @SuppressLint("MissingPermission")
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -67,6 +73,17 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // brings up a listview of all available devices to connect to
             case R.id.menu_search_devices:
+
+//                FragmentManager mFragmentManager = getSupportFragmentManager();
+//                // grab the fragment
+//                Fragment fragment = mFragmentManager.findFragmentById(R.id.list);
+//                FragmentTransaction ft = mFragmentManager.beginTransaction();
+//                // add to stack so we can get back to main activity from the fragment
+//                ft.addToBackStack("bluetoothFragment");
+//                assert fragment != null;
+//                ft.add(R.id.list, fragment);
+//                ft.commit();
+
 //                FragmentManager fm = getSupportFragmentManager();
 //                BluetoothFragment fragment = new BluetoothFragment();
 //                fm.beginTransaction().add(R.id.main_activity_container,fragment).commit();
@@ -83,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("Bluetooth ", " is now turned on");
                 }
                 return true;
+            case android.R.id.home:
+
             default:
                 return super.onOptionsItemSelected(item);
         }

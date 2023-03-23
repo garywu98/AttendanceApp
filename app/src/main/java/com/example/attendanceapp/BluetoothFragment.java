@@ -3,18 +3,27 @@ package com.example.attendanceapp;
 import android.content.Context;
 import android.os.Bundle;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.attendanceapp.placeholder.PlaceholderContent;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.zip.Inflater;
 
 /**
  * A fragment representing a list of Items.
@@ -52,12 +61,41 @@ public class BluetoothFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+        // create an action bar that will have a back button
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
+
+    /*
+    Sets up the menu bar for the fragment
+     */
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_bluetooth_discovery, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // moves back to the main activity
+            case android.R.id.home:
+//                FragmentManager fm = getActivity().getSupportFragmentManager();
+//                fm.beginTransaction().remove(fm.findFragmentById(R.id.list));
+//                fm.popBackStack();
+//                requireActivity().setTitle(getString(R.string.app_name));
+
+                // showCustomToast("Test message!", R.drawable.baseline_check_circle_24);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_bluetooth_list, container, false);
+        setHasOptionsMenu(true);
+        requireActivity().setTitle(getString(R.string.bluetooth_fragment_title));
 
         // Set the adapter
         if (view instanceof RecyclerView) {
