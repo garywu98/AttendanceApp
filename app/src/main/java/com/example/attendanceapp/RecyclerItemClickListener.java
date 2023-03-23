@@ -8,12 +8,14 @@ import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.lang.reflect.InvocationTargetException;
+
 
 public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
     private OnItemClickListener mListener;
 
     public interface OnItemClickListener {
-        public void onItemClick(View view, int position);
+        public void onItemClick(View view, int position) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException;
 
         public void onLongItemClick(View view, int position);
     }
@@ -41,7 +43,11 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
     @Override public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
         View childView = view.findChildViewUnder(e.getX(), e.getY());
         if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
-            mListener.onItemClick(childView, view.getChildAdapterPosition(childView));
+            try {
+                mListener.onItemClick(childView, view.getChildAdapterPosition(childView));
+            } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException ex) {
+                throw new RuntimeException(ex);
+            }
             return true;
         }
         return false;

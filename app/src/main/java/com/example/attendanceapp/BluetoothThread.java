@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.ParcelUuid;
 import android.renderscript.ScriptGroup;
 import android.util.Log;
 
@@ -20,15 +21,16 @@ import androidx.core.app.ActivityCompat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 import java.util.logging.LogRecord;
 
 public class BluetoothThread extends Thread {
-    private final BluetoothSocket bluetoothSocket;
+    private BluetoothSocket bluetoothSocket;
     private final BluetoothDevice bluetoothDevice;
     private final BluetoothAdapter bluetoothAdapter;
     private final String TAG = "BluetoothThread";
-    private final UUID ATTEND_UUID = UUID.fromString("950c98f4-42ae-4618-874c-86eb1544e341");
+    private final UUID ATTEND_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private final InputStream inputStream;
     private final OutputStream outputStream;
     private byte[] streamBuffer;
@@ -77,7 +79,7 @@ public class BluetoothThread extends Thread {
     @Override
     @SuppressWarnings("MissingPermission")
     public void run() {
-        Log.d("Here", " Thread is created");
+        Log.d("Run", " Thread is created");
 
         bluetoothAdapter.cancelDiscovery();
         streamBuffer = new byte[1024];
@@ -87,14 +89,28 @@ public class BluetoothThread extends Thread {
             // Connect to the remote device through the socket. This call blocks
             // until it succeeds or throws an exception.
             bluetoothSocket.connect();
+            Log.d("Run", " Thread is connected");
         } catch (IOException connectException) {
             // Unable to connect; close the socket and return.
+
             try {
-                Log.d("Could not connect ", "BluetoothThread");
-                bluetoothSocket.close();
-            } catch (IOException closeException) {
-                Log.e(TAG, "Could not close the client socket", closeException);
+                Log.e("","trying fallback...");
+
+                bluetoothSocket = (BluetoothSocket) bluetoothDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(bluetoothDevice,1);
+                bluetoothSocket.connect();
+
+                Log.e("","Connected");
             }
+            catch (Exception e2) {
+                Log.e("", "Couldn't establish Bluetooth connection!");
+            }
+
+//            try {
+//                Log.e(TAG, "could not connect ", connectException);
+//                bluetoothSocket.close();
+//            } catch (IOException closeException) {
+//                Log.e(TAG, "Could not close the client socket", closeException);
+//            }
             return;
         }
 

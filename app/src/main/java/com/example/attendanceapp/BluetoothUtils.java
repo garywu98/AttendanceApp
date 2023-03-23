@@ -65,10 +65,10 @@ public class BluetoothUtils {
 
 
             //display results
-            for(String device : discoveredDevicesAdapter) {
-                System.out.println("UUID");
-                System.out.println(UUID.randomUUID());
-            }
+//            for(String device : discoveredDevicesAdapter) {
+//                System.out.println("UUID");
+//                System.out.println(UUID.randomUUID());
+//            }
 
             FragmentManager fm = main.getSupportFragmentManager();
             BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter, mBluetoothAdapter);
@@ -105,11 +105,11 @@ public class BluetoothUtils {
 //        createBluetoothThread();
     }
 
-    public void createBluetoothThread() {
-        testDevice = mBluetoothAdapter.getRemoteDevice("BE:AC:10:00:00:01");
-        BluetoothThread thread = new BluetoothThread(testDevice, mBluetoothAdapter, new Handler());
-        thread.run();
-    }
+//    public void createBluetoothThread() {
+//        testDevice = mBluetoothAdapter.getRemoteDevice("BE:AC:10:00:00:01");
+//        BluetoothThread thread = new BluetoothThread(testDevice, mBluetoothAdapter, new Handler());
+//        thread.run();
+//    }
 
 //    public void devicesPaired() {
 //        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
