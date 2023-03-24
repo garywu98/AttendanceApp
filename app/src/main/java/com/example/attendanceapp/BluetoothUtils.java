@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
 import android.util.Log;
 
 import androidx.fragment.app.FragmentActivity;
@@ -15,6 +16,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class BluetoothUtils {
         private BluetoothAdapter mBluetoothAdapter;
@@ -22,6 +24,8 @@ public class BluetoothUtils {
     // holds the discoverable devices
     private ArrayList<String> discoverableDeviceList = new ArrayList<>();
     MainActivity main = null;
+
+    private BluetoothDevice testDevice;
 
 
     BluetoothUtils(BluetoothAdapter mBluetoothAdapter) {
@@ -63,9 +67,10 @@ public class BluetoothUtils {
 
 
             //display results
-            for(String device : discoveredDevicesAdapter) {
-                System.out.println(device);
-            }
+//            for(String device : discoveredDevicesAdapter) {
+//                System.out.println("UUID");
+//                System.out.println(UUID.randomUUID());
+//            }
 
 //            FragmentManager fm = main.getSupportFragmentManager();
 //            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter);
@@ -106,7 +111,15 @@ public class BluetoothUtils {
             filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
             activity.registerReceiver(discoveryFinishReceiver, filter);
         }
+
+//        createBluetoothThread();
     }
+
+//    public void createBluetoothThread() {
+//        testDevice = mBluetoothAdapter.getRemoteDevice("BE:AC:10:00:00:01");
+//        BluetoothThread thread = new BluetoothThread(testDevice, mBluetoothAdapter, new Handler());
+//        thread.run();
+//    }
 
 //    public void devicesPaired() {
 //        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {

@@ -1,8 +1,14 @@
 package com.example.attendanceapp;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,19 +43,21 @@ public class BluetoothFragment extends Fragment {
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private static List<String> devices;
+    private static BluetoothAdapter mBluetoothAdapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public BluetoothFragment(List<String> devices) {
+    public BluetoothFragment(List<String> devices, BluetoothAdapter mBluetoothAdapter) {
         this.devices = devices;
+        this.mBluetoothAdapter = mBluetoothAdapter;
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static BluetoothFragment newInstance(int columnCount) {
-        BluetoothFragment fragment = new BluetoothFragment(devices);
+        BluetoothFragment fragment = new BluetoothFragment(devices, mBluetoothAdapter);
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -115,7 +123,23 @@ public class BluetoothFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
+            recyclerView.addOnItemTouchListener(
+                    new RecyclerItemClickListener(context, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                        @Override public void onItemClick(View view, int position) {
+                            String address = devices.get(position).split("\n")[1];
+                            System.out.println(address);
+                            BluetoothDevice testDevice = mBluetoothAdapter.getRemoteDevice(address);
+                            BluetoothThread thread = new BluetoothThread(testDevice, mBluetoothAdapter, new Handler());
+                            thread.run();
+                        }
+
+                        @Override public void onLongItemClick(View view, int position) {
+                            // do whatever
+                        }
+                    })
+            );
             recyclerView.setAdapter(new DeviceListRecyclerViewAdapter(devices));
+
         }
         return view;
     }
