@@ -73,6 +73,7 @@ public class BluetoothUtils {
             FragmentManager fm = main.getSupportFragmentManager();
             BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter);
             FragmentTransaction ft = fm.beginTransaction();
+
             // add to stack so we can get back to main activity from the fragment
             ft.addToBackStack("bluetoothFragment");
             int backStackEntryCount = fm.getBackStackEntryCount();

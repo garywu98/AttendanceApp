@@ -1,6 +1,7 @@
 package com.example.attendanceapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBar;
@@ -79,14 +80,19 @@ public class BluetoothFragment extends Fragment {
         switch (item.getItemId()) {
             // moves back to the main activity
             case android.R.id.home:
-//                FragmentManager fm = requireActivity().getSupportFragmentManager();
-//                fm.beginTransaction().remove(Objects.requireNonNull(fm.findFragmentById(R.id.main_activity_container))).commit();
-//                fm.popBackStackImmediate();
-//                Log.d("fragmentPop", String.valueOf(fm.getBackStackEntryCount()));
+                FragmentManager fm = requireActivity().getSupportFragmentManager();
 
-//                requireActivity().setTitle(getString(R.string.app_name));
-
-                // showCustomToast("Test message!", R.drawable.baseline_check_circle_24);
+                // pops every fragment off the stack to get back to the main page
+                while(fm.getBackStackEntryCount() > 0) {
+                    fm.popBackStackImmediate();
+                    // set the action bar back to its original values from the main activity
+                    if(fm.getBackStackEntryCount() == 1) {
+                        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+                        actionBar.setDisplayHomeAsUpEnabled(false);
+                        requireActivity().setTitle(getString(R.string.app_name));
+                    }
+                    Log.d("fragmentPop", String.valueOf(fm.getBackStackEntryCount()));
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
