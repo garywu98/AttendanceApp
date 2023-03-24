@@ -76,7 +76,7 @@ public class BluetoothUtils {
 //            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter);
 //            fm.beginTransaction().add(R.id.main_activity_container,fragment).commit();
             FragmentManager fm = main.getSupportFragmentManager();
-            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter);
+            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter, mBluetoothAdapter);
             FragmentTransaction ft = fm.beginTransaction();
 
             // add to stack so we can get back to main activity from the fragment
@@ -112,33 +112,8 @@ public class BluetoothUtils {
             activity.registerReceiver(discoveryFinishReceiver, filter);
         }
 
-//        createBluetoothThread();
     }
 
-//    public void createBluetoothThread() {
-//        testDevice = mBluetoothAdapter.getRemoteDevice("BE:AC:10:00:00:01");
-//        BluetoothThread thread = new BluetoothThread(testDevice, mBluetoothAdapter, new Handler());
-//        thread.run();
-//    }
-
-//    public void devicesPaired() {
-//        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-//
-//            return;
-//        }
-//        pairedDevices = mBluetoothAdapter.getBondedDevices();
-//
-//        ArrayList list = new ArrayList();
-//
-//        for (BluetoothDevice bt : pairedDevices) {
-//            list.add(bt.getName());
-//        }
-//
-//        final ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, list);
-//
-//        //Front
-////        lv.setAdapter(adapter);
-//    }
 
     @SuppressLint("MissingPermission")
     protected void destroy(MainActivity activity) {
