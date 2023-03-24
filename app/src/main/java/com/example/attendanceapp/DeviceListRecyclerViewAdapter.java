@@ -1,5 +1,6 @@
 package com.example.attendanceapp;
 
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -45,12 +46,16 @@ public class DeviceListRecyclerViewAdapter extends RecyclerView.Adapter<DeviceLi
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView mIdView;
         public final TextView mContentView;
+
+        // Laura Code
+        public final CardView mCardView;
         public String mItem;
 
         public ViewHolder(FragmentBluetoothBinding binding) {
             super(binding.getRoot());
             mIdView = binding.itemNumber;
             mContentView = binding.content;
+            mCardView = binding.bluetoothCard;
         }
 
         @Override

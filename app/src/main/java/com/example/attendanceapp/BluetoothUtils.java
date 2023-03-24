@@ -10,7 +10,9 @@ import android.content.IntentFilter;
 import android.os.Handler;
 import android.util.Log;
 
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,10 +72,18 @@ public class BluetoothUtils {
 //                System.out.println(UUID.randomUUID());
 //            }
 
+//            FragmentManager fm = main.getSupportFragmentManager();
+//            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter);
+//            fm.beginTransaction().add(R.id.main_activity_container,fragment).commit();
             FragmentManager fm = main.getSupportFragmentManager();
-            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter, mBluetoothAdapter);
-            fm.beginTransaction().add(R.id.main_activity_container,fragment).commit();
+            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter);
+            FragmentTransaction ft = fm.beginTransaction();
 
+            // add to stack so we can get back to main activity from the fragment
+            ft.addToBackStack("bluetoothFragment");
+            int backStackEntryCount = fm.getBackStackEntryCount();
+            Log.d("fragmentStack", String.valueOf(backStackEntryCount));
+            ft.add(R.id.main_activity_container,fragment).commit();
         }
     };
 
@@ -81,7 +91,7 @@ public class BluetoothUtils {
     public void discoverDevices(MainActivity activity) {
         discoveredDevicesAdapter = new ArrayList<>();
 
-        visible(activity);
+         visible(activity);
 
         Log.d("discoverDevices ", "invoked");
 
