@@ -37,10 +37,10 @@ import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
 
-
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothUtils bluetoothUtils;
     private Permissions perm;
+    TextView textView;
     Button showDevicesBtn;
 
     // intent value for enabling bluetooth
@@ -54,6 +54,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        textView = (TextView) findViewById((R.id.message));
+
+        // temporary code to be able to test layout for student sign in page
+        Button btn = (Button)findViewById(R.id.test_button);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, StudentSignInActivity.class);
+                MainActivity.this.startActivity(i);
+            }
+        });
     }
 
     /*
@@ -100,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("Bluetooth ", " is now turned on");
                 }
                 return true;
-            case android.R.id.home:
+
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -134,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         bluetoothUtils.setMainActivity(this);
         perm = new Permissions(getApplicationInfo().targetSdkVersion);
 
-        TextView textView = (TextView) findViewById((R.id.message));
+
 
 
         if (mBluetoothAdapter == null) {
@@ -164,8 +175,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
-
-
 
         if(perm != null) perm.checkAndRequestPermissions(this);
         else {
