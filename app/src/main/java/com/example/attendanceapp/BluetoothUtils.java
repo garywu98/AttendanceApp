@@ -55,7 +55,7 @@ public class BluetoothUtils {
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-                if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
+                if (device.getName() != null) {
                     Log.d("discoveryFinishReceiver ", "here 1");
                     discoveredDevicesAdapter.add(device.getName() + "\n" + device.getAddress());
                 }
