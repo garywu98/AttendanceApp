@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,16 @@ public class StudentSignInActivity extends MainActivity {
         testButton = findViewById(R.id.test_button);
         IDInputBox = findViewById(R.id.input_box);
 
+        // set up dynamic list values here
+
+        RecyclerView recyclerView = findViewById(R.id.studentIDRecyclerview);
+
+        //****figure out why the list is not printing correctly on screen
+        StudentInfoRecyclerViewAdapter adapter = new StudentInfoRecyclerViewAdapter(testList);
+
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         testButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -45,24 +56,29 @@ public class StudentSignInActivity extends MainActivity {
                 // add id to the arraylist
                 if(testList.size() < 5) {
                     testList.add(0, cardInfo);
+                    adapter.notifyItemInserted(0);
                 }
                 else if (testList.size() == 5){
                     testList.remove(testList.size() - 1);
+                    adapter.notifyItemRemoved(testList.size());
                     testList.add(0, cardInfo);
+                    adapter.notifyItemInserted(0);
                 }
 
                 System.out.println(testList.toString());
             }
         });
+    }
 
-        // set up dynamic list values here
+    @Override
+    protected void onDestroy() {
+        Log.d("StudentSignInActivity", "onDestroy is called");
+        super.onDestroy();
+    }
 
-        RecyclerView recyclerView = findViewById(R.id.studentIDRecyclerview);
-
-        //****figure out why the list is not printing correctly on screen
-        StudentInfoRecyclerViewAdapter adapter = new StudentInfoRecyclerViewAdapter(testList);
-
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    @Override
+    public void onBackPressed() {
+        finish();
+        Log.d("StudentSignInActivity", "OnBackPressed is called");
     }
 }

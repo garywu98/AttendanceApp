@@ -117,7 +117,7 @@ public class BluetoothUtils {
 
     @SuppressLint("MissingPermission")
     protected void destroy(MainActivity activity) {
-        activity.unregisterReceiver(discoveryFinishReceiver);
+//        activity.unregisterReceiver(discoveryFinishReceiver);
         mBluetoothAdapter.cancelDiscovery();
     }
 }
