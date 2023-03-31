@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 default:
                     String readMessage = new String(readBuf);
                     idList = readMessage.split("\n");
+                    Log.d("IdList: ", idList[0]);
                     break;
             }
         }
