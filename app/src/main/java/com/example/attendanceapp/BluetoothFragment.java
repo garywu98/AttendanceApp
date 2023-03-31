@@ -42,20 +42,22 @@ public class BluetoothFragment extends Fragment {
     private int mColumnCount = 1;
     private static List<String> devices;
     private static BluetoothAdapter mBluetoothAdapter;
+    private static Handler handler;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public BluetoothFragment(List<String> devices, BluetoothAdapter mBluetoothAdapter) {
+    public BluetoothFragment(List<String> devices, BluetoothAdapter mBluetoothAdapter, Handler handler) {
         this.devices = devices;
         this.mBluetoothAdapter = mBluetoothAdapter;
+        this.handler = handler;
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static BluetoothFragment newInstance(int columnCount) {
-        BluetoothFragment fragment = new BluetoothFragment(devices, mBluetoothAdapter);
+        BluetoothFragment fragment = new BluetoothFragment(devices, mBluetoothAdapter, handler);
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -127,7 +129,7 @@ public class BluetoothFragment extends Fragment {
                             String address = devices.get(position).split("\n")[1];
                             System.out.println(address);
                             BluetoothDevice testDevice = mBluetoothAdapter.getRemoteDevice(address);
-                            BluetoothThread thread = new BluetoothThread(testDevice, mBluetoothAdapter, new Handler());
+                            BluetoothThread thread = new BluetoothThread(testDevice, mBluetoothAdapter, handler);
                             thread.run();
                         }
 

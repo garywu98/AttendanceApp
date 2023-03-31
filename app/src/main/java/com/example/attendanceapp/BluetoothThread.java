@@ -30,7 +30,7 @@ public class BluetoothThread extends Thread {
     private final BluetoothDevice bluetoothDevice;
     private final BluetoothAdapter bluetoothAdapter;
     private final String TAG = "BluetoothThread";
-    private final UUID ATTEND_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private final UUID ATTEND_UUID = UUID.nameUUIDFromBytes("e0cbf06c-cd8b-4647-bb8a-263b43f0f974".getBytes());
     private final InputStream inputStream;
     private final OutputStream outputStream;
     private byte[] streamBuffer;
@@ -54,7 +54,7 @@ public class BluetoothThread extends Thread {
         this.handler = handler;
 
         try {
-            tempSocket = bluetoothDevice.createRfcommSocketToServiceRecord(ATTEND_UUID);
+            tempSocket = device.createRfcommSocketToServiceRecord(ATTEND_UUID);
         } catch (IOException e) {
             Log.e(TAG, "Socket's create() method failed", e);
         }
@@ -113,6 +113,9 @@ public class BluetoothThread extends Thread {
 //            }
             return;
         }
+
+        String initialMessage = "*ID*";
+        write(initialMessage.getBytes());
 
         while(true) {
             try {
