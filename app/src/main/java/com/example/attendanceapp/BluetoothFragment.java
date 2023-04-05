@@ -3,7 +3,6 @@ package com.example.attendanceapp;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -19,19 +18,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import com.example.attendanceapp.placeholder.PlaceholderContent;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.zip.Inflater;
 
 /**
  * A fragment representing a list of Items.
@@ -71,6 +62,7 @@ public class BluetoothFragment extends Fragment {
         }
         // create an action bar that will have a back button
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        assert actionBar != null;
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
@@ -102,6 +94,14 @@ public class BluetoothFragment extends Fragment {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem devices_item = menu.findItem(R.id.menu_search_devices);
+        devices_item.setVisible(false);
+
+        MenuItem bluetooth_item = menu.findItem(R.id.menu_enable_bluetooth);
+        bluetooth_item.setVisible(false);
     }
 
 

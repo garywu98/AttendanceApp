@@ -1,20 +1,18 @@
 package com.example.attendanceapp;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 
 import java.util.ArrayList;
@@ -22,8 +20,8 @@ import java.util.Arrays;
 
 public class StudentSignInActivity extends MainActivity {
 
-    ArrayList<String> testList = new ArrayList<>(Arrays.asList("12345", "54321", "43321"));
-    Button testButton;
+
+    ArrayList<String> mostRecentIDsSignedIn = new ArrayList<>(Arrays.asList("12345", "54321", "43321"));
     EditText IDInputBox;
     String cardInfo;
 
@@ -32,42 +30,104 @@ public class StudentSignInActivity extends MainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_sign_in);
 
-        testButton = findViewById(R.id.test_button);
+        // invalidate action bar inherited from main activity
+        this.invalidateOptionsMenu();
+
+//        testButton = findViewById(R.id.test_button);
         IDInputBox = findViewById(R.id.input_box);
 
-        // set up dynamic list values here
+        // set up list values received from Attend app here
 
         RecyclerView recyclerView = findViewById(R.id.studentIDRecyclerview);
 
-        //****figure out why the list is not printing correctly on screen
-        StudentInfoRecyclerViewAdapter adapter = new StudentInfoRecyclerViewAdapter(testList);
+        StudentInfoRecyclerViewAdapter adapter = new StudentInfoRecyclerViewAdapter(mostRecentIDsSignedIn);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cardInfo = IDInputBox.getText().toString();
-                // close keyboard on phone
-                InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-                inputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(),0);
+        // on keyboard action, check if a newline (enter) key is pressed
+       IDInputBox.setOnKeyListener(new View.OnKeyListener() {
+           public boolean onKey(View v, int keyCode, KeyEvent event) {
+               if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                   switch (keyCode) {
+                       case KeyEvent.KEYCODE_DPAD_CENTER:
+                           case KeyEvent.KEYCODE_ENTER:
+                               validateIDFromTextBox(v, adapter);
+                               IDInputBox.getText().clear();
+                               return true;
+                               default:
+                                   break;
+                   }
+               }
+               return false;
+           }
+       });
 
-                // add id to the arraylist
-                if(testList.size() < 5) {
-                    testList.add(0, cardInfo);
-                    adapter.notifyItemInserted(0);
-                }
-                else if (testList.size() == 5){
-                    testList.remove(testList.size() - 1);
-                    adapter.notifyItemRemoved(testList.size());
-                    testList.add(0, cardInfo);
-                    adapter.notifyItemInserted(0);
-                }
+//        testButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                cardInfo = IDInputBox.getText().toString();
+//                // close keyboard on phone
+//                InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+//                inputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(),0);
+//
+//                // add id to the arraylist
+//                if(testList.size() < 5) {
+//                    testList.add(0, cardInfo);
+//                    adapter.notifyItemInserted(0);
+//                }
+//                else if (testList.size() == 5){
+//                    testList.remove(testList.size() - 1);
+//                    adapter.notifyItemRemoved(testList.size());
+//                    testList.add(0, cardInfo);
+//                    adapter.notifyItemInserted(0);
+//                }
+//
+//                System.out.println(testList.toString());
+//            }
+//        });
+    }
 
-                System.out.println(testList.toString());
-            }
-        });
+
+    // hides the devices button and bluetooth button from the action bar
+    // when we reach the sign in page
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_student_sign_in, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem devices_item = menu.findItem(R.id.menu_search_devices);
+        devices_item.setVisible(false);
+
+        MenuItem bluetooth_item = menu.findItem(R.id.menu_enable_bluetooth);
+        bluetooth_item.setVisible(false);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    // compares ID inputted with IDs from Attend app, sends confirmation, and adds
+    // value to most recent list of signed in students
+    private void validateIDFromTextBox(View view, StudentInfoRecyclerViewAdapter adapter) {
+        cardInfo = IDInputBox.getText().toString();
+        // close keyboard on phone
+        InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(),0);
+
+        // add id to the arraylist
+        if(mostRecentIDsSignedIn.size() < 5) {
+            mostRecentIDsSignedIn.add(0, cardInfo);
+            adapter.notifyItemInserted(0);
+        }
+        else if (mostRecentIDsSignedIn.size() == 5){
+            mostRecentIDsSignedIn.remove(mostRecentIDsSignedIn.size() - 1);
+            adapter.notifyItemRemoved(mostRecentIDsSignedIn.size());
+            mostRecentIDsSignedIn.add(0, cardInfo);
+            adapter.notifyItemInserted(0);
+        }
+
+        System.out.println(mostRecentIDsSignedIn.toString());
     }
 
     @Override
