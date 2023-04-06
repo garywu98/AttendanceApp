@@ -19,19 +19,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import com.example.attendanceapp.placeholder.PlaceholderContent;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.zip.Inflater;
 
 /**
  * A fragment representing a list of Items.
@@ -73,6 +65,7 @@ public class BluetoothFragment extends Fragment {
         }
         // create an action bar that will have a back button
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        assert actionBar != null;
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
@@ -106,6 +99,14 @@ public class BluetoothFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem devices_item = menu.findItem(R.id.menu_search_devices);
+        devices_item.setVisible(false);
+
+        MenuItem bluetooth_item = menu.findItem(R.id.menu_enable_bluetooth);
+        bluetooth_item.setVisible(false);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -131,6 +132,9 @@ public class BluetoothFragment extends Fragment {
                             BluetoothDevice testDevice = mBluetoothAdapter.getRemoteDevice(address);
                             BluetoothThread thread = new BluetoothThread(testDevice, mBluetoothAdapter, handler);
                             thread.run();
+
+                            Intent i = new Intent(getActivity(), StudentSignInActivity.class);
+                            getActivity().startActivity(i);
                         }
 
                         @Override public void onLongItemClick(View view, int position) {

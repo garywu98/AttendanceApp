@@ -262,8 +262,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
         bluetoothUtils.destroy(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("MainActivity", "onDestroy is called");
+        super.onDestroy();
     }
 }
