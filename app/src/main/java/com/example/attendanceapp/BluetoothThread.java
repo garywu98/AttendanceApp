@@ -30,11 +30,12 @@ public class BluetoothThread extends Thread {
     private final BluetoothDevice bluetoothDevice;
     private final BluetoothAdapter bluetoothAdapter;
     private final String TAG = "BluetoothThread";
-    private final UUID ATTEND_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    private final InputStream inputStream;
-    private final OutputStream outputStream;
+    private final UUID ATTEND_UUID = UUID.fromString("e0cbf06c-cd8b-4647-bb8a-263b43f0f974");
+    private InputStream inputStream;
+    private OutputStream outputStream;
     private byte[] streamBuffer;
     private Handler handler;
+
 
     private interface MessageConstants {
         public static final int MESSAGE_READ = 0;
@@ -54,7 +55,7 @@ public class BluetoothThread extends Thread {
         this.handler = handler;
 
         try {
-            tempSocket = bluetoothDevice.createRfcommSocketToServiceRecord(ATTEND_UUID);
+            tempSocket = device.createInsecureRfcommSocketToServiceRecord(ATTEND_UUID);
         } catch (IOException e) {
             Log.e(TAG, "Socket's create() method failed", e);
         }
@@ -81,9 +82,13 @@ public class BluetoothThread extends Thread {
     public void run() {
         Log.d("Run", " Thread is created");
 
-        bluetoothAdapter.cancelDiscovery();
+
+        boolean test = bluetoothAdapter.cancelDiscovery();
+        System.out.println(test);
         streamBuffer = new byte[1024];
         int numBytes;
+        InputStream tempInputStream = null;
+        OutputStream tempOutputStream = null;
 
         try {
             // Connect to the remote device through the socket. This call blocks
@@ -92,18 +97,7 @@ public class BluetoothThread extends Thread {
             Log.d("Run", " Thread is connected");
         } catch (IOException connectException) {
             // Unable to connect; close the socket and return.
-
-            try {
-                Log.e("","trying fallback...");
-
-                bluetoothSocket = (BluetoothSocket) bluetoothDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(bluetoothDevice,1);
-                bluetoothSocket.connect();
-
-                Log.e("","Connected");
-            }
-            catch (Exception e2) {
-                Log.e("", "Couldn't establish Bluetooth connection!");
-            }
+            Log.e("ConnectionError", connectException.toString());
 
 //            try {
 //                Log.e(TAG, "could not connect ", connectException);
@@ -111,8 +105,13 @@ public class BluetoothThread extends Thread {
 //            } catch (IOException closeException) {
 //                Log.e(TAG, "Could not close the client socket", closeException);
 //            }
-            return;
         }
+
+        if(bluetoothSocket.isConnected()) {
+            Log.d("bluetoothSocket", "Socket is connected before write");
+        }
+        String initialMessage = "*ID*";
+        write(initialMessage.getBytes());
 
         while(true) {
             try {

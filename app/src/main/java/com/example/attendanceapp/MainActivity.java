@@ -12,7 +12,8 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-
+import android.os.Handler;
+import android.os.Message;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
@@ -45,6 +46,27 @@ public class MainActivity extends AppCompatActivity {
 
     // intent value for enabling bluetooth
     int REQUEST_ENABLE_BT = 1;
+
+    private String[] idList;
+
+    private final Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            byte[] readBuf = (byte[]) msg.obj;
+            switch (readBuf.length) {
+                case 0:
+                    Log.d("Handler", "Empty message received");
+                    break;
+                default:
+                    String readMessage = new String(readBuf);
+                    idList = readMessage.split("\n");
+                    Log.d("IdList: ", idList[0]);
+                    break;
+            }
+        }
+    };
+
+
 
     @Override
     /*
@@ -185,8 +207,21 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
     }
 
+    @SuppressLint("MissingPermission")
     public void discoverDevices() {
-        bluetoothUtils.discoverDevices(this);
+//        bluetoothUtils.discoverDevices(this);
+
+        int requestCode = 1;
+        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+        startActivityForResult(discoverableIntent, requestCode);
+
+        bluetoothUtils.discoverDevices(this, handler);
+    }
+
+    private void sendID(String id) {
+        byte[] idMessage = id.getBytes();
+        bluetoothUtils.write(idMessage);
     }
 
     @Override
