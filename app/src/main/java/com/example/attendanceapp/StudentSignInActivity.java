@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +25,11 @@ public class StudentSignInActivity extends MainActivity {
     ArrayList<String> mostRecentIDsSignedIn = new ArrayList<>(Arrays.asList("12345", "54321", "43321"));
     EditText IDInputBox;
     String cardInfo;
+    String[] idList = {"1234567890", "9876543210"};
+    ArrayList<String> signedInList = new ArrayList<>();
+    BluetoothThread btThread;
+    int totalStudents = idList.length;
+    int numSignedIn = 0;
 
 
 
@@ -31,6 +37,9 @@ public class StudentSignInActivity extends MainActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_sign_in);
+
+//        idList = getIntent().getExtras().getStringArray("idList");
+//        btThread = (BluetoothThread) getIntent().getExtras().getSerializable("thread");
 
         // invalidate action bar inherited from main activity
         this.invalidateOptionsMenu();
@@ -47,14 +56,11 @@ public class StudentSignInActivity extends MainActivity {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        MediaPlayer mp = MediaPlayer.create(this, R.raw.ding_36029);
-
         // on keyboard action, check if a newline (enter) key is pressed
        IDInputBox.setOnKeyListener(new View.OnKeyListener() {
            public boolean onKey(View v, int keyCode, KeyEvent event) {
 
                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                   mp.start();
                    switch (keyCode) {
                        case KeyEvent.KEYCODE_DPAD_CENTER:
                            case KeyEvent.KEYCODE_ENTER:
@@ -120,20 +126,49 @@ public class StudentSignInActivity extends MainActivity {
         // close keyboard on phone
         InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(),0);
+        MediaPlayer mp = MediaPlayer.create(this, R.raw.ding_36029);
+        int firstDelimiter = cardInfo.indexOf('=');
+        cardInfo = cardInfo.substring(firstDelimiter + 1, firstDelimiter + 11);
 
+        boolean isFound = false;
+        boolean isDuplicate = false;
 
+        for(String id : idList) {
+            if(signedInList.contains(cardInfo)){
+                isDuplicate = true;
+                break;
+            }
 
-
-        // add id to the arraylist
-        if(mostRecentIDsSignedIn.size() < 5) {
-            mostRecentIDsSignedIn.add(0, cardInfo);
-            adapter.notifyItemInserted(0);
+            if(id.equals(cardInfo)) {
+                signedInList.add(cardInfo);
+                isFound = true;
+                break;
+            }
         }
-        else if (mostRecentIDsSignedIn.size() == 5){
-            mostRecentIDsSignedIn.remove(mostRecentIDsSignedIn.size() - 1);
-            adapter.notifyItemRemoved(mostRecentIDsSignedIn.size());
-            mostRecentIDsSignedIn.add(0, cardInfo);
-            adapter.notifyItemInserted(0);
+
+        if(isFound) {
+            Toast.makeText(this, "You have been signed in", Toast.LENGTH_SHORT).show();
+            // add id to the arraylist
+            if (mostRecentIDsSignedIn.size() < 5) {
+                mostRecentIDsSignedIn.add(0, cardInfo);
+                adapter.notifyItemInserted(0);
+            } else if (mostRecentIDsSignedIn.size() == 5) {
+                mostRecentIDsSignedIn.remove(mostRecentIDsSignedIn.size() - 1);
+                adapter.notifyItemRemoved(mostRecentIDsSignedIn.size());
+                mostRecentIDsSignedIn.add(0, cardInfo);
+                adapter.notifyItemInserted(0);
+            }
+
+            //write card info to thread
+//            btThread.write(cardInfo.getBytes());
+
+            mp.start();
+        }
+        else if(isDuplicate) {
+            Toast.makeText(this, "You have already been signed in", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(this, "Not found in the list, please speak with the professor", Toast.LENGTH_SHORT).show();
         }
 
         System.out.println(mostRecentIDsSignedIn.toString());

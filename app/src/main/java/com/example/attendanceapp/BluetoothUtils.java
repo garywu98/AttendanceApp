@@ -86,8 +86,7 @@ public class BluetoothUtils {
     public void discoverDevices(MainActivity activity, Handler handler) {
         discoveredDevicesAdapter = new ArrayList<>();
         this.handler = handler;
-
-         visible(activity);
+        visible(activity);
 
         Log.d("discoverDevices ", "invoked");
 

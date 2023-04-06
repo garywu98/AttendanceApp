@@ -35,6 +35,7 @@ public class BluetoothFragment extends Fragment {
     private static List<String> devices;
     private static BluetoothAdapter mBluetoothAdapter;
     private static Handler handler;
+    private String[] idList;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -131,9 +132,12 @@ public class BluetoothFragment extends Fragment {
                             System.out.println(address);
                             BluetoothDevice testDevice = mBluetoothAdapter.getRemoteDevice(address);
                             BluetoothThread thread = new BluetoothThread(testDevice, mBluetoothAdapter, handler);
-                            thread.run();
+//                            thread.run();
 
                             Intent i = new Intent(getActivity(), StudentSignInActivity.class);
+
+//                            i.putExtra("idList", idList);
+//                            i.putExtra("thread", thread);
                             getActivity().startActivity(i);
                         }
 
@@ -146,5 +150,9 @@ public class BluetoothFragment extends Fragment {
 
         }
         return view;
+    }
+
+    public void setIdList(String[] idList) {
+        this.idList = idList;
     }
 }

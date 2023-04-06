@@ -46,8 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     // intent value for enabling bluetooth
     int REQUEST_ENABLE_BT = 1;
-
-    private String[] idList;
+    public String[] idList;
 
     private final Handler handler = new Handler() {
         @Override
@@ -60,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
                 default:
                     String readMessage = new String(readBuf);
                     idList = readMessage.split("\n");
+//                    BluetoothFragment fm = (BluetoothFragment) getSupportFragmentManager().findFragmentById(R.id.list);
+//                    fm.setIdList(idList);
                     Log.d("IdList: ", idList[0]);
                     break;
             }
