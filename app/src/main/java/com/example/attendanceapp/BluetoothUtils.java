@@ -1,6 +1,7 @@
 package com.example.attendanceapp;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class BluetoothUtils {
-        private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothAdapter mBluetoothAdapter;
     private List<String> discoveredDevicesAdapter;
     // holds the discoverable devices
     private ArrayList<String> discoverableDeviceList = new ArrayList<>();
@@ -65,13 +66,6 @@ public class BluetoothUtils {
                 }
             }
 
-
-            //display results
-//            for(String device : discoveredDevicesAdapter) {
-//                System.out.println("UUID");
-//                System.out.println(UUID.randomUUID());
-//            }
-
 //            FragmentManager fm = main.getSupportFragmentManager();
 //            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter);
 //            fm.beginTransaction().add(R.id.main_activity_container,fragment).commit();
@@ -114,10 +108,15 @@ public class BluetoothUtils {
 
     }
 
-
     @SuppressLint("MissingPermission")
-    protected void destroy(MainActivity activity) {
-//        activity.unregisterReceiver(discoveryFinishReceiver);
-        mBluetoothAdapter.cancelDiscovery();
+    protected void destroy(Activity activity) {
+        Log.e("Destroy ", "Destroyed");
+        try {
+            activity.unregisterReceiver(discoveryFinishReceiver);
+            mBluetoothAdapter.cancelDiscovery();
+        }
+        catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.example.attendanceapp;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -129,6 +130,9 @@ public class BluetoothFragment extends Fragment {
                             BluetoothDevice testDevice = mBluetoothAdapter.getRemoteDevice(address);
                             BluetoothThread thread = new BluetoothThread(testDevice, mBluetoothAdapter, new Handler());
                             thread.run();
+
+                            Intent i = new Intent(getActivity(), StudentSignInActivity.class);
+                            getActivity().startActivity(i);
                         }
 
                         @Override public void onLongItemClick(View view, int position) {

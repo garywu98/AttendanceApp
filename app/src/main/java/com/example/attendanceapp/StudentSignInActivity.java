@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -20,10 +21,11 @@ import java.util.Arrays;
 
 public class StudentSignInActivity extends MainActivity {
 
-
     ArrayList<String> mostRecentIDsSignedIn = new ArrayList<>(Arrays.asList("12345", "54321", "43321"));
     EditText IDInputBox;
     String cardInfo;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +47,14 @@ public class StudentSignInActivity extends MainActivity {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        MediaPlayer mp = MediaPlayer.create(this, R.raw.ding_36029);
+
         // on keyboard action, check if a newline (enter) key is pressed
        IDInputBox.setOnKeyListener(new View.OnKeyListener() {
            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                   mp.start();
                    switch (keyCode) {
                        case KeyEvent.KEYCODE_DPAD_CENTER:
                            case KeyEvent.KEYCODE_ENTER:
@@ -114,6 +120,9 @@ public class StudentSignInActivity extends MainActivity {
         // close keyboard on phone
         InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(),0);
+
+
+
 
         // add id to the arraylist
         if(mostRecentIDsSignedIn.size() < 5) {
