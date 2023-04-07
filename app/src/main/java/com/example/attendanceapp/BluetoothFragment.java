@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,23 +39,40 @@ public class BluetoothFragment extends Fragment {
     private static List<String> devices;
     private static BluetoothAdapter mBluetoothAdapter;
 
-    private static String[] idList;
+    private static ArrayList<String> idList = new ArrayList<>();
 
     @SuppressLint("HandlerLeak")
     public static final Handler handler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
+            int beginIndex = -1;
+            int endIndex = 0;
             byte[] readBuf = (byte[]) msg.obj;
+            String readMessage = new String(readBuf);
+            Log.d("readMessage", readMessage);
             switch (readBuf.length) {
                 case 0:
                     Log.d("Handler", "Empty message received");
                     break;
                 default:
-                    String readMessage = new String(readBuf);
-                    idList = readMessage.split("\n");
-//                    BluetoothFragment fm = (BluetoothFragment) getSupportFragmentManager().findFragmentById(R.id.list);
-//                    fm.setIdList(idList);
-                    Log.d("IdList: ", idList[0]);
+                    while(readBuf[endIndex] != 0) {
+                        beginIndex = endIndex;
+                        // read until we find a newline character or empty data
+                        for(; !Character.isWhitespace(readBuf[endIndex]) && readBuf[endIndex] != 0; endIndex++) {
+                            // check for empty data or newline character
+                            if (readBuf[endIndex] == 0 || Character.isWhitespace(readBuf[endIndex])) {
+                                endIndex++;
+                                break;
+                            }
+                        }
+                        if(endIndex - beginIndex == 10) {
+                            String id = readMessage.substring(beginIndex, endIndex);
+                            if(!idList.contains(id))
+                                idList.add(id);
+                        }
+                    }
+                    Log.d("IdList: ", idList.toString());
+
                     break;
             }
         }
@@ -174,7 +192,4 @@ public class BluetoothFragment extends Fragment {
         return view;
     }
 
-    public void setIdList(String[] idList) {
-        this.idList = idList;
-    }
 }

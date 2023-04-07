@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.LogRecord;
 
@@ -87,7 +88,7 @@ public class BluetoothThread extends Thread {
         boolean test = bluetoothAdapter.cancelDiscovery();
         System.out.println(test);
         streamBuffer = new byte[1024];
-        int numBytes;
+        int numBytes = 0;
         InputStream tempInputStream = null;
         OutputStream tempOutputStream = null;
 
@@ -113,16 +114,15 @@ public class BluetoothThread extends Thread {
 
         while(true) {
             try {
-                Log.d("Listening ", "BluetoothThread");
-                numBytes = inputStream.read(streamBuffer);
-                Message readMsg = handler.obtainMessage(MessageConstants.MESSAGE_READ, numBytes, -1,
-                                                        streamBuffer);
-                byte[] readBuf = (byte[]) readMsg.obj;
-                String readMessage = new String(readBuf);
-                Log.d("Listening message", readMessage);
 
-                readMsg.setTarget(handler);
-                readMsg.sendToTarget();
+                    Log.d("Listening ", "BluetoothThread");
+                    numBytes = inputStream.read(streamBuffer);
+                    Log.d("streamBuffer", Arrays.toString(streamBuffer));
+                    Message readMsg = handler.obtainMessage(MessageConstants.MESSAGE_READ, numBytes, -1,
+                            streamBuffer);
+
+                    readMsg.setTarget(handler);
+                    readMsg.sendToTarget();
             } catch (IOException e) {
                 Log.d(TAG, "Input stream was disconnected", e);
                 break;
@@ -134,7 +134,6 @@ public class BluetoothThread extends Thread {
     public void write(byte[] bytes) {
         try {
             outputStream.write(bytes);
-
             Message writtenMsg = handler.obtainMessage(MessageConstants.MESSAGE_WRITE,
                     -1, -1, streamBuffer);
             writtenMsg.sendToTarget();
