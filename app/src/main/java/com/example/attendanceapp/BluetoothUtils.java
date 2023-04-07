@@ -71,7 +71,7 @@ public class BluetoothUtils {
 //            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter);
 //            fm.beginTransaction().add(R.id.main_activity_container,fragment).commit();
             FragmentManager fm = main.getSupportFragmentManager();
-            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter, mBluetoothAdapter, handler);
+            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter, mBluetoothAdapter);
             FragmentTransaction ft = fm.beginTransaction();
 
             // add to stack so we can get back to main activity from the fragment
@@ -83,9 +83,8 @@ public class BluetoothUtils {
     };
 
     @SuppressLint("MissingPermission")
-    public void discoverDevices(MainActivity activity, Handler handler) {
+    public void discoverDevices(MainActivity activity) {
         discoveredDevicesAdapter = new ArrayList<>();
-        this.handler = handler;
         visible(activity);
 
         Log.d("discoverDevices ", "invoked");

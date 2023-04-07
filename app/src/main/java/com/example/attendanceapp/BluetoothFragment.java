@@ -1,15 +1,18 @@
 package com.example.attendanceapp;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -34,23 +37,42 @@ public class BluetoothFragment extends Fragment {
     private int mColumnCount = 1;
     private static List<String> devices;
     private static BluetoothAdapter mBluetoothAdapter;
-    private static Handler handler;
-    private String[] idList;
+
+    private static String[] idList;
+
+    @SuppressLint("HandlerLeak")
+    public static final Handler handler = new Handler() {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            byte[] readBuf = (byte[]) msg.obj;
+            switch (readBuf.length) {
+                case 0:
+                    Log.d("Handler", "Empty message received");
+                    break;
+                default:
+                    String readMessage = new String(readBuf);
+                    idList = readMessage.split("\n");
+//                    BluetoothFragment fm = (BluetoothFragment) getSupportFragmentManager().findFragmentById(R.id.list);
+//                    fm.setIdList(idList);
+                    Log.d("IdList: ", idList[0]);
+                    break;
+            }
+        }
+    };
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public BluetoothFragment(List<String> devices, BluetoothAdapter mBluetoothAdapter, Handler handler) {
+    public BluetoothFragment(List<String> devices, BluetoothAdapter mBluetoothAdapter) {
         this.devices = devices;
         this.mBluetoothAdapter = mBluetoothAdapter;
-        this.handler = handler;
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static BluetoothFragment newInstance(int columnCount) {
-        BluetoothFragment fragment = new BluetoothFragment(devices, mBluetoothAdapter, handler);
+        BluetoothFragment fragment = new BluetoothFragment(devices, mBluetoothAdapter);
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -132,7 +154,7 @@ public class BluetoothFragment extends Fragment {
                             System.out.println(address);
                             BluetoothDevice testDevice = mBluetoothAdapter.getRemoteDevice(address);
                             BluetoothThread thread = new BluetoothThread(testDevice, mBluetoothAdapter, handler);
-//                            thread.run();
+                            thread.start();
 
                             Intent i = new Intent(getActivity(), StudentSignInActivity.class);
 

@@ -26,7 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 import java.util.logging.LogRecord;
 
-public class BluetoothThread extends Thread implements Serializable {
+public class BluetoothThread extends Thread {
     private BluetoothSocket bluetoothSocket;
     private final BluetoothDevice bluetoothDevice;
     private final BluetoothAdapter bluetoothAdapter;
@@ -108,9 +108,6 @@ public class BluetoothThread extends Thread implements Serializable {
 //            }
         }
 
-        if(bluetoothSocket.isConnected()) {
-            Log.d("bluetoothSocket", "Socket is connected before write");
-        }
         String initialMessage = "*ID*";
         write(initialMessage.getBytes());
 
@@ -120,6 +117,11 @@ public class BluetoothThread extends Thread implements Serializable {
                 numBytes = inputStream.read(streamBuffer);
                 Message readMsg = handler.obtainMessage(MessageConstants.MESSAGE_READ, numBytes, -1,
                                                         streamBuffer);
+                byte[] readBuf = (byte[]) readMsg.obj;
+                String readMessage = new String(readBuf);
+                Log.d("Listening message", readMessage);
+
+                readMsg.setTarget(handler);
                 readMsg.sendToTarget();
             } catch (IOException e) {
                 Log.d(TAG, "Input stream was disconnected", e);

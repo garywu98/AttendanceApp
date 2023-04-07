@@ -46,26 +46,26 @@ public class MainActivity extends AppCompatActivity {
 
     // intent value for enabling bluetooth
     int REQUEST_ENABLE_BT = 1;
-    public String[] idList;
+    public static String[] idList;
 
-    private final Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            byte[] readBuf = (byte[]) msg.obj;
-            switch (readBuf.length) {
-                case 0:
-                    Log.d("Handler", "Empty message received");
-                    break;
-                default:
-                    String readMessage = new String(readBuf);
-                    idList = readMessage.split("\n");
-//                    BluetoothFragment fm = (BluetoothFragment) getSupportFragmentManager().findFragmentById(R.id.list);
-//                    fm.setIdList(idList);
-                    Log.d("IdList: ", idList[0]);
-                    break;
-            }
-        }
-    };
+//    public static final Handler handler = new Handler() {
+//        @Override
+//        public void handleMessage(@NonNull Message msg) {
+//            byte[] readBuf = (byte[]) msg.obj;
+//            switch (readBuf.length) {
+//                case 0:
+//                    Log.d("Handler", "Empty message received");
+//                    break;
+//                default:
+//                    String readMessage = new String(readBuf);
+//                    idList = readMessage.split("\n");
+////                    BluetoothFragment fm = (BluetoothFragment) getSupportFragmentManager().findFragmentById(R.id.list);
+////                    fm.setIdList(idList);
+//                    Log.d("IdList: ", idList[0]);
+//                    break;
+//            }
+//        }
+//    };
 
 
 
@@ -210,14 +210,8 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("MissingPermission")
     public void discoverDevices() {
-//        bluetoothUtils.discoverDevices(this);
-
-        int requestCode = 1;
-        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-        startActivityForResult(discoverableIntent, requestCode);
-
-        bluetoothUtils.discoverDevices(this, handler);
+          bluetoothUtils.discoverDevices(this);
+//        bluetoothUtils.discoverDevices(this, handler);
     }
 
     private void sendID(String id) {
