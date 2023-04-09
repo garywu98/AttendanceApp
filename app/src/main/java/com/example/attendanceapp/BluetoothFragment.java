@@ -40,6 +40,7 @@ public class BluetoothFragment extends Fragment {
     private static BluetoothAdapter mBluetoothAdapter;
 
     private static ArrayList<String> idList = new ArrayList<>();
+    public static BluetoothThread btThread;
 
     @SuppressLint("HandlerLeak")
     public static final Handler handler = new Handler() {
@@ -47,34 +48,19 @@ public class BluetoothFragment extends Fragment {
         public void handleMessage(@NonNull Message msg) {
             int beginIndex = -1;
             int endIndex = 0;
-            byte[] readBuf = (byte[]) msg.obj;
-            String readMessage = new String(readBuf);
+           // byte[] readBuf = (byte[]) msg.obj;
+            String readMessage = new String((byte []) msg.obj);
             Log.d("readMessage", readMessage);
-            switch (readBuf.length) {
-                case 0:
-                    Log.d("Handler", "Empty message received");
-                    break;
-                default:
-                    while(readBuf[endIndex] != 0) {
-                        beginIndex = endIndex;
-                        // read until we find a newline character or empty data
-                        for(; !Character.isWhitespace(readBuf[endIndex]) && readBuf[endIndex] != 0; endIndex++) {
-                            // check for empty data or newline character
-                            if (readBuf[endIndex] == 0 || Character.isWhitespace(readBuf[endIndex])) {
-                                endIndex++;
-                                break;
-                            }
-                        }
-                        if(endIndex - beginIndex == 10) {
-                            String id = readMessage.substring(beginIndex, endIndex);
-                            if(!idList.contains(id))
-                                idList.add(id);
-                        }
-                    }
-                    Log.d("IdList: ", idList.toString());
 
-                    break;
+            String[] result = readMessage.split("\\n");
+            for (int x=0; x<result.length; x++) {
+                System.out.println(result[x]);
+                if(result[x].length() == 10 && !idList.contains(result[x])) {
+                    Log.d("CorrectId", result[x]);
+                    idList.add(result[x]);
+                }
             }
+
         }
     };
 
@@ -172,12 +158,12 @@ public class BluetoothFragment extends Fragment {
                             System.out.println(address);
                             BluetoothDevice testDevice = mBluetoothAdapter.getRemoteDevice(address);
                             BluetoothThread thread = new BluetoothThread(testDevice, mBluetoothAdapter, handler);
+                            btThread = thread;
                             thread.start();
 
                             Intent i = new Intent(getActivity(), StudentSignInActivity.class);
 
-//                            i.putExtra("idList", idList);
-//                            i.putExtra("thread", thread);
+                            i.putExtra("idList", idList.toArray());
                             getActivity().startActivity(i);
                         }
 
@@ -190,6 +176,14 @@ public class BluetoothFragment extends Fragment {
 
         }
         return view;
+    }
+
+    public static BluetoothThread threadGetter() {
+        return btThread;
+    }
+
+    public static ArrayList<String> idListGetter() {
+        return idList;
     }
 
 }

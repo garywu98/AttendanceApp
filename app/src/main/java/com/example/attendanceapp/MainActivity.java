@@ -48,27 +48,6 @@ public class MainActivity extends AppCompatActivity {
     int REQUEST_ENABLE_BT = 1;
     public static String[] idList;
 
-//    public static final Handler handler = new Handler() {
-//        @Override
-//        public void handleMessage(@NonNull Message msg) {
-//            byte[] readBuf = (byte[]) msg.obj;
-//            switch (readBuf.length) {
-//                case 0:
-//                    Log.d("Handler", "Empty message received");
-//                    break;
-//                default:
-//                    String readMessage = new String(readBuf);
-//                    idList = readMessage.split("\n");
-////                    BluetoothFragment fm = (BluetoothFragment) getSupportFragmentManager().findFragmentById(R.id.list);
-////                    fm.setIdList(idList);
-//                    Log.d("IdList: ", idList[0]);
-//                    break;
-//            }
-//        }
-//    };
-
-
-
     @Override
     /*
         Sets up the content on the screen, calls initBluetooth()
@@ -108,19 +87,6 @@ public class MainActivity extends AppCompatActivity {
             // brings up a listview of all available devices to connect to
             case R.id.menu_search_devices:
 
-//                FragmentManager mFragmentManager = getSupportFragmentManager();
-//                // grab the fragment
-//                Fragment fragment = mFragmentManager.findFragmentById(R.id.list);
-//                FragmentTransaction ft = mFragmentManager.beginTransaction();
-//                // add to stack so we can get back to main activity from the fragment
-//                ft.addToBackStack("bluetoothFragment");
-//                assert fragment != null;
-//                ft.add(R.id.list, fragment);
-//                ft.commit();
-
-//                FragmentManager fm = getSupportFragmentManager();
-//                BluetoothFragment fragment = new BluetoothFragment();
-//                fm.beginTransaction().add(R.id.main_activity_container,fragment).commit();
                 discoverDevices();
                 // showCustomToast("Test message!", R.drawable.baseline_check_circle_24);
                 return true;

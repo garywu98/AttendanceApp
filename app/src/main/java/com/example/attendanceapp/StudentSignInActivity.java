@@ -40,6 +40,7 @@ public class StudentSignInActivity extends MainActivity {
 
 //        idList = getIntent().getExtras().getStringArray("idList");
 //        btThread = (BluetoothThread) getIntent().getExtras().getSerializable("thread");
+        btThread = BluetoothFragment.threadGetter();
 
         // invalidate action bar inherited from main activity
         this.invalidateOptionsMenu();
@@ -74,30 +75,6 @@ public class StudentSignInActivity extends MainActivity {
                return false;
            }
        });
-
-//        testButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                cardInfo = IDInputBox.getText().toString();
-//                // close keyboard on phone
-//                InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-//                inputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(),0);
-//
-//                // add id to the arraylist
-//                if(testList.size() < 5) {
-//                    testList.add(0, cardInfo);
-//                    adapter.notifyItemInserted(0);
-//                }
-//                else if (testList.size() == 5){
-//                    testList.remove(testList.size() - 1);
-//                    adapter.notifyItemRemoved(testList.size());
-//                    testList.add(0, cardInfo);
-//                    adapter.notifyItemInserted(0);
-//                }
-//
-//                System.out.println(testList.toString());
-//            }
-//        });
     }
 
 
@@ -127,11 +104,11 @@ public class StudentSignInActivity extends MainActivity {
         InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getApplicationWindowToken(),0);
         MediaPlayer mp = MediaPlayer.create(this, R.raw.ding_36029);
-        int firstDelimiter = cardInfo.indexOf('=');
-        cardInfo = cardInfo.substring(firstDelimiter + 1, firstDelimiter + 11);
 
         boolean isFound = false;
         boolean isDuplicate = false;
+        idList = BluetoothFragment.idListGetter().toArray(new String[0]);
+        Log.d("StudentSignInActivity", Arrays.toString(idList));
 
         for(String id : idList) {
             if(signedInList.contains(cardInfo)){
@@ -139,7 +116,7 @@ public class StudentSignInActivity extends MainActivity {
                 break;
             }
 
-            if(id.equals(cardInfo)) {
+            if(cardInfo.contains(id)) {
                 signedInList.add(cardInfo);
                 isFound = true;
                 break;
@@ -160,7 +137,7 @@ public class StudentSignInActivity extends MainActivity {
             }
 
             //write card info to thread
-//            btThread.write(cardInfo.getBytes());
+            btThread.write(cardInfo.getBytes());
 
             mp.start();
         }

@@ -12,10 +12,13 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcel;
 import android.os.ParcelUuid;
+import android.os.Parcelable;
 import android.renderscript.ScriptGroup;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
 import java.io.IOException;
@@ -37,7 +40,6 @@ public class BluetoothThread extends Thread {
     private OutputStream outputStream;
     private byte[] streamBuffer;
     private Handler handler;
-
 
     private interface MessageConstants {
         public static final int MESSAGE_READ = 0;
@@ -87,7 +89,6 @@ public class BluetoothThread extends Thread {
 
         boolean test = bluetoothAdapter.cancelDiscovery();
         System.out.println(test);
-        streamBuffer = new byte[1024];
         int numBytes = 0;
         InputStream tempInputStream = null;
         OutputStream tempOutputStream = null;
@@ -114,15 +115,28 @@ public class BluetoothThread extends Thread {
 
         while(true) {
             try {
-
+                    streamBuffer = new byte[1024];
                     Log.d("Listening ", "BluetoothThread");
                     numBytes = inputStream.read(streamBuffer);
+//                    String bufferString = new String(streamBuffer);
+//                    Log.d("streamBuffer", Arrays.toString(streamBuffer));
+//                    Message readMsg = handler.obtainMessage(MessageConstants.MESSAGE_READ, numBytes, -1,
+//                            bufferString);
+                int counter = 0;
+
+                for(counter = 0; streamBuffer[counter] != 0; counter++);
+                if(counter != 0) {
+//                    String bufferString = new String(streamBuffer).substring(0, counter);
+                    byte[] bufferClone = Arrays.copyOfRange(streamBuffer, 0, counter);
                     Log.d("streamBuffer", Arrays.toString(streamBuffer));
                     Message readMsg = handler.obtainMessage(MessageConstants.MESSAGE_READ, numBytes, -1,
-                            streamBuffer);
-
+                            bufferClone);
                     readMsg.setTarget(handler);
                     readMsg.sendToTarget();
+                }
+
+//                    readMsg.setTarget(handler);
+//                    readMsg.sendToTarget();
             } catch (IOException e) {
                 Log.d(TAG, "Input stream was disconnected", e);
                 break;
@@ -134,18 +148,18 @@ public class BluetoothThread extends Thread {
     public void write(byte[] bytes) {
         try {
             outputStream.write(bytes);
-            Message writtenMsg = handler.obtainMessage(MessageConstants.MESSAGE_WRITE,
-                    -1, -1, streamBuffer);
-            writtenMsg.sendToTarget();
+//            Message writtenMsg = handler.obtainMessage(MessageConstants.MESSAGE_WRITE,
+//                    -1, -1, streamBuffer);
+//            writtenMsg.sendToTarget();
         } catch (IOException e) {
             Log.e(TAG, "Error occurred when sending data", e);
 
-            Message writeErrorMsg = handler.obtainMessage(MessageConstants.MESSAGE_TOAST);
-            Bundle bundle = new Bundle();
-            bundle.putString("toast",
-                    "Couldn't send data to the other device");
-            writeErrorMsg.setData(bundle);
-            handler.sendMessage(writeErrorMsg);
+//            Message writeErrorMsg = handler.obtainMessage(MessageConstants.MESSAGE_TOAST);
+//            Bundle bundle = new Bundle();
+//            bundle.putString("toast",
+//                    "Couldn't send data to the other device");
+//            writeErrorMsg.setData(bundle);
+//            handler.sendMessage(writeErrorMsg);
         }
     }
 
