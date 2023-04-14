@@ -102,6 +102,8 @@ public class BluetoothThread extends Thread {
             // Unable to connect; close the socket and return.
             Log.e("ConnectionError", connectException.toString());
 
+
+
 //            try {
 //                Log.e(TAG, "could not connect ", connectException);
 //                bluetoothSocket.close();

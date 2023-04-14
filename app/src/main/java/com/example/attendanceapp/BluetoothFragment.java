@@ -28,6 +28,7 @@ import android.view.MenuItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * A fragment representing a list of Items.
@@ -161,6 +162,7 @@ public class BluetoothFragment extends Fragment {
                             btThread = thread;
                             thread.start();
 
+
                             Intent i = new Intent(getActivity(), StudentSignInActivity.class);
 
                             i.putExtra("idList", idList.toArray());
@@ -185,5 +187,4 @@ public class BluetoothFragment extends Fragment {
     public static ArrayList<String> idListGetter() {
         return idList;
     }
-
 }

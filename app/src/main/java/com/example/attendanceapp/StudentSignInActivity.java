@@ -1,5 +1,6 @@
 package com.example.attendanceapp;
 
+import androidx.annotation.DrawableRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,8 +14,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -22,10 +26,13 @@ import java.util.Arrays;
 
 public class StudentSignInActivity extends MainActivity {
 
-    ArrayList<String> mostRecentIDsSignedIn = new ArrayList<>(Arrays.asList("12345", "54321", "43321"));
+    ArrayList<String> mostRecentIDsSignedIn = new ArrayList<>();
     EditText IDInputBox;
     String cardInfo;
-    String[] idList = {"1234567890", "9876543210"};
+    TextView numStudentSignedIn;
+    String formattedString;
+    int signInStudents = 0;
+    String[] idList = {};
     ArrayList<String> signedInList = new ArrayList<>();
     BluetoothThread btThread;
     int totalStudents = idList.length;
@@ -41,6 +48,12 @@ public class StudentSignInActivity extends MainActivity {
 //        idList = getIntent().getExtras().getStringArray("idList");
 //        btThread = (BluetoothThread) getIntent().getExtras().getSerializable("thread");
         btThread = BluetoothFragment.threadGetter();
+
+        numStudentSignedIn = findViewById(R.id.numStudentsSignedIn);
+        formattedString = numStudentSignedIn.getText().toString();
+
+        numStudentSignedIn.setText("—");
+
 
         // invalidate action bar inherited from main activity
         this.invalidateOptionsMenu();
@@ -99,6 +112,7 @@ public class StudentSignInActivity extends MainActivity {
     // compares ID inputted with IDs from Attend app, sends confirmation, and adds
     // value to most recent list of signed in students
     private void validateIDFromTextBox(View view, StudentInfoRecyclerViewAdapter adapter) {
+        String newFormattedString;
         cardInfo = IDInputBox.getText().toString();
         // close keyboard on phone
         InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
@@ -109,6 +123,10 @@ public class StudentSignInActivity extends MainActivity {
         boolean isDuplicate = false;
         idList = BluetoothFragment.idListGetter().toArray(new String[0]);
         Log.d("StudentSignInActivity", Arrays.toString(idList));
+        newFormattedString = String.format(formattedString, signInStudents, idList.length);
+        numStudentSignedIn.setText(newFormattedString);
+
+        String idShort = "";
 
         for(String id : idList) {
             if(signedInList.contains(cardInfo)){
@@ -118,21 +136,26 @@ public class StudentSignInActivity extends MainActivity {
 
             if(cardInfo.contains(id)) {
                 signedInList.add(cardInfo);
+                idShort = id;
                 isFound = true;
                 break;
             }
         }
 
         if(isFound) {
-            Toast.makeText(this, "You have been signed in", Toast.LENGTH_SHORT).show();
+            signInStudents++;
+            newFormattedString = String.format(formattedString, signInStudents, idList.length);
+            numStudentSignedIn.setText(newFormattedString);
+            showCustomToast("You have been signed in", R.drawable.baseline_check_circle_24);
+//            Toast.makeText(this, "You have been signed in", Toast.LENGTH_SHORT).show();
             // add id to the arraylist
             if (mostRecentIDsSignedIn.size() < 5) {
-                mostRecentIDsSignedIn.add(0, cardInfo);
+                mostRecentIDsSignedIn.add(0, idShort);
                 adapter.notifyItemInserted(0);
             } else if (mostRecentIDsSignedIn.size() == 5) {
                 mostRecentIDsSignedIn.remove(mostRecentIDsSignedIn.size() - 1);
                 adapter.notifyItemRemoved(mostRecentIDsSignedIn.size());
-                mostRecentIDsSignedIn.add(0, cardInfo);
+                mostRecentIDsSignedIn.add(0, idShort);
                 adapter.notifyItemInserted(0);
             }
 
@@ -142,13 +165,32 @@ public class StudentSignInActivity extends MainActivity {
             mp.start();
         }
         else if(isDuplicate) {
-            Toast.makeText(this, "You have already been signed in", Toast.LENGTH_SHORT).show();
+            showCustomToast("You have already been signed in", R.drawable.baseline_cancel_24);
+//            Toast.makeText(this, "You have already been signed in", Toast.LENGTH_SHORT).show();
         }
         else {
-            Toast.makeText(this, "Not found in the list, please speak with the professor", Toast.LENGTH_SHORT).show();
+            showCustomToast("Not found in the list, please speak with the professor", R.drawable.baseline_cancel_24);
+//            Toast.makeText(this, "Not found in the list, please speak with the professor", Toast.LENGTH_SHORT).show();
         }
 
         System.out.println(mostRecentIDsSignedIn.toString());
+    }
+
+    // creates a toast, inflates it, and sets the custom parameters for the
+    // custom toast message
+    private void showCustomToast(String message, @DrawableRes int image) {
+        Toast toast = new Toast(getApplicationContext());
+        View view = getLayoutInflater().inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.viewContainer));
+        toast.setView(view);
+
+        ImageView toastImage = (ImageView) view.findViewById((R.id.toastImage));
+        toastImage.setImageResource(image);
+
+        TextView toastMessage = view.findViewById(R.id.toastMessage);
+        toastMessage.setText(message);
+
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.show();
     }
 
     @Override

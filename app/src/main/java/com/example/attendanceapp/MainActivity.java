@@ -57,16 +57,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         textView = (TextView) findViewById((R.id.message));
-
-        // temporary code to be able to test layout for student sign in page
-        Button btn = (Button)findViewById(R.id.test_button);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this, StudentSignInActivity.class);
-                MainActivity.this.startActivity(i);
-            }
-        });
     }
 
     /*
@@ -88,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_search_devices:
 
                 discoverDevices();
-                // showCustomToast("Test message!", R.drawable.baseline_check_circle_24);
                 return true;
             case R.id.menu_enable_bluetooth:
                 if (!mBluetoothAdapter.isEnabled()) {
@@ -106,25 +95,6 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    // creates a toast, inflates it, and sets the custom parameters for the
-    // custom toast message
-    private void showCustomToast(String message, @DrawableRes int image) {
-        Toast toast = new Toast(getApplicationContext());
-        View view = getLayoutInflater().inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.viewContainer));
-        toast.setView(view);
-
-        ImageView toastImage = (ImageView) view.findViewById((R.id.toastImage));
-        toastImage.setImageResource(image);
-
-        TextView toastMessage = view.findViewById(R.id.toastMessage);
-        toastMessage.setText(message);
-
-        toast.setDuration(Toast.LENGTH_LONG);
-        toast.show();
-    }
-
-
 
     @SuppressLint("MissingPermission")
     @Override
@@ -188,14 +158,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        for(int i = 0; i < grantResults.length; i++) {
-            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permission Granted..", Toast.LENGTH_SHORT).show();
-                Toast.makeText(this, permissions[i], Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Permission Denied..", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     // checking if the bluetooth enable was granted or denied by the user
