@@ -3,13 +3,17 @@ package com.example.attendanceapp;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-
+import android.os.Handler;
+import android.os.Message;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
@@ -33,13 +37,16 @@ import android.util.Log;
 
 
 public class MainActivity extends AppCompatActivity {
+
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothUtils bluetoothUtils;
     private Permissions perm;
+    TextView textView;
     Button showDevicesBtn;
 
     // intent value for enabling bluetooth
     int REQUEST_ENABLE_BT = 1;
+    public static String[] idList;
 
     @Override
     /*
@@ -49,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        textView = (TextView) findViewById((R.id.message));
     }
 
     /*
@@ -59,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+
     // Handles action when the user presses one of the buttons on the menu bar
     @SuppressLint("MissingPermission")
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -67,11 +76,8 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // brings up a listview of all available devices to connect to
             case R.id.menu_search_devices:
-//                FragmentManager fm = getSupportFragmentManager();
-//                BluetoothFragment fragment = new BluetoothFragment();
-//                fm.beginTransaction().add(R.id.main_activity_container,fragment).commit();
+
                 discoverDevices();
-                // showCustomToast("Test message!", R.drawable.baseline_check_circle_24);
                 return true;
             case R.id.menu_enable_bluetooth:
                 if (!mBluetoothAdapter.isEnabled()) {
@@ -83,29 +89,12 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("Bluetooth ", " is now turned on");
                 }
                 return true;
+
+
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    // creates a toast, inflates it, and sets the custom parameters for the
-    // custom toast message
-    private void showCustomToast(String message, @DrawableRes int image) {
-        Toast toast = new Toast(getApplicationContext());
-        View view = getLayoutInflater().inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.viewContainer));
-        toast.setView(view);
-
-        ImageView toastImage = (ImageView) view.findViewById((R.id.toastImage));
-        toastImage.setImageResource(image);
-
-        TextView toastMessage = view.findViewById(R.id.toastMessage);
-        toastMessage.setText(message);
-
-        toast.setDuration(Toast.LENGTH_LONG);
-        toast.show();
-    }
-
-
 
     @SuppressLint("MissingPermission")
     @Override
@@ -115,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         bluetoothUtils.setMainActivity(this);
         perm = new Permissions(getApplicationInfo().targetSdkVersion);
 
-        TextView textView = (TextView) findViewById((R.id.message));
+
 
 
         if (mBluetoothAdapter == null) {
@@ -146,8 +135,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-
-
         if(perm != null) perm.checkAndRequestPermissions(this);
         else {
             Log.d("onStart ", "Perm is null");
@@ -157,21 +144,20 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
     }
 
+    @SuppressLint("MissingPermission")
     public void discoverDevices() {
-        bluetoothUtils.discoverDevices(this);
+          bluetoothUtils.discoverDevices(this);
+//        bluetoothUtils.discoverDevices(this, handler);
+    }
+
+    private void sendID(String id) {
+        byte[] idMessage = id.getBytes();
+        bluetoothUtils.write(idMessage);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        for(int i = 0; i < grantResults.length; i++) {
-            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permission Granted..", Toast.LENGTH_SHORT).show();
-                Toast.makeText(this, permissions[i], Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Permission Denied..", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     // checking if the bluetooth enable was granted or denied by the user
@@ -199,8 +185,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
         bluetoothUtils.destroy(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("MainActivity", "onDestroy is called");
+        super.onDestroy();
     }
 }

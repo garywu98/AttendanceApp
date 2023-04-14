@@ -1,25 +1,33 @@
 package com.example.attendanceapp;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
 import android.util.Log;
 
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class BluetoothUtils {
-        private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothAdapter mBluetoothAdapter;
     private List<String> discoveredDevicesAdapter;
     // holds the discoverable devices
     private ArrayList<String> discoverableDeviceList = new ArrayList<>();
     MainActivity main = null;
+
+    private BluetoothThread btThread;
+    private Handler handler;
 
 
     BluetoothUtils(BluetoothAdapter mBluetoothAdapter) {
@@ -48,7 +56,7 @@ public class BluetoothUtils {
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-                if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
+                if (device.getName() != null) {
                     Log.d("discoveryFinishReceiver ", "here 1");
                     discoveredDevicesAdapter.add(device.getName() + "\n" + device.getAddress());
                 }
@@ -59,22 +67,24 @@ public class BluetoothUtils {
                 }
             }
 
-
-            //display results
-            for(String device : discoveredDevicesAdapter) {
-                System.out.println(device);
-            }
-
+//            FragmentManager fm = main.getSupportFragmentManager();
+//            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter);
+//            fm.beginTransaction().add(R.id.main_activity_container,fragment).commit();
             FragmentManager fm = main.getSupportFragmentManager();
-            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter);
-            fm.beginTransaction().add(R.id.main_activity_container,fragment).commit();
+            BluetoothFragment fragment = new BluetoothFragment(discoveredDevicesAdapter, mBluetoothAdapter);
+            FragmentTransaction ft = fm.beginTransaction();
+
+            // add to stack so we can get back to main activity from the fragment
+            ft.addToBackStack("bluetoothFragment");
+            int backStackEntryCount = fm.getBackStackEntryCount();
+            Log.d("fragmentStack", String.valueOf(backStackEntryCount));
+            ft.add(R.id.main_activity_container,fragment).commit();
         }
     };
 
     @SuppressLint("MissingPermission")
     public void discoverDevices(MainActivity activity) {
         discoveredDevicesAdapter = new ArrayList<>();
-
         visible(activity);
 
         Log.d("discoverDevices ", "invoked");
@@ -95,30 +105,22 @@ public class BluetoothUtils {
             filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
             activity.registerReceiver(discoveryFinishReceiver, filter);
         }
+
     }
 
-//    public void devicesPaired() {
-//        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-//
-//            return;
-//        }
-//        pairedDevices = mBluetoothAdapter.getBondedDevices();
-//
-//        ArrayList list = new ArrayList();
-//
-//        for (BluetoothDevice bt : pairedDevices) {
-//            list.add(bt.getName());
-//        }
-//
-//        final ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, list);
-//
-//        //Front
-////        lv.setAdapter(adapter);
-//    }
-
+    public void write(byte[] id) {
+        btThread.write(id);
+    }
+    
     @SuppressLint("MissingPermission")
-    protected void destroy(MainActivity activity) {
-        activity.unregisterReceiver(discoveryFinishReceiver);
-        mBluetoothAdapter.cancelDiscovery();
+    protected void destroy(Activity activity) {
+        Log.e("Destroy ", "Destroyed");
+        try {
+            activity.unregisterReceiver(discoveryFinishReceiver);
+            mBluetoothAdapter.cancelDiscovery();
+        }
+        catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
     }
 }
