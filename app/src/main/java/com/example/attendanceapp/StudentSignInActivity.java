@@ -62,11 +62,9 @@ public class StudentSignInActivity extends MainActivity {
         numStudentSignedIn = findViewById(R.id.numStudentsSignedIn);
         formattedString = numStudentSignedIn.getText().toString();
 
-        //get the ID list from fragment
-        idList = BluetoothFragment.idListGetter().toArray(new String[0]);
-
         // setting the number of students signed in to reflect the total number of students in the class
         String newFormattedString;
+        Log.d("IDList", "IDList instantiated to 0 for the first time");
         idList = BluetoothFragment.idListGetter().toArray(new String[0]);
         newFormattedString = String.format(formattedString, signInStudents, idList.length);
         numStudentSignedIn.setText(newFormattedString);

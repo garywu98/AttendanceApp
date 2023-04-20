@@ -42,7 +42,8 @@
         <activity
             android:name=".StudentSignInActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|keyboard" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
