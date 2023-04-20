@@ -12,6 +12,11 @@ import com.example.attendanceapp.databinding.FragmentBluetoothBinding;
 
 import java.util.List;
 
+/*
+    Written by Noah Johnson, Jocelyn Chen, Gary Wu, Elin Yang, and Laura Villarreal
+     for CS4485.0w1, senior design project, started February 11 2023
+    NetIDs: ntj200000, jpc180002, gyw200000, yxy190022, lmv180001
+ */
 /**
  * {@link RecyclerView.Adapter} that can display a {@link PlaceholderItem}.
  * TODO: Replace the implementation with code for your data type.

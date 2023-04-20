@@ -23,7 +23,11 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
+/*
+    Written by Noah Johnson, Jocelyn Chen, Gary Wu, Elin Yang, and Laura Villarreal
+     for CS4485.0w1, senior design project, started February 11 2023
+    NetIDs: ntj200000, jpc180002, gyw200000, yxy190022, lmv180001
+ */
 public class StudentSignInActivity extends MainActivity {
 
     ArrayList<String> mostRecentIDsSignedIn = new ArrayList<>();
@@ -35,6 +39,7 @@ public class StudentSignInActivity extends MainActivity {
     String[] idList = {};
     ArrayList<String> signedInList = new ArrayList<>();
     BluetoothThread btThread;
+
     int totalStudents = idList.length;
     int numSignedIn = 0;
 
@@ -45,23 +50,25 @@ public class StudentSignInActivity extends MainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_sign_in);
 
-//        idList = getIntent().getExtras().getStringArray("idList");
-//        btThread = (BluetoothThread) getIntent().getExtras().getSerializable("thread");
         btThread = BluetoothFragment.threadGetter();
 
         numStudentSignedIn = findViewById(R.id.numStudentsSignedIn);
         formattedString = numStudentSignedIn.getText().toString();
 
-        numStudentSignedIn.setText("—");
+        // setting the number of students signed in to reflect the total number of students in the class
+        String newFormattedString;
+        idList = BluetoothFragment.idListGetter().toArray(new String[0]);
+        newFormattedString = String.format(formattedString, signInStudents, idList.length);
+        numStudentSignedIn.setText(newFormattedString);
+
 
 
         // invalidate action bar inherited from main activity
         this.invalidateOptionsMenu();
 
-//        testButton = findViewById(R.id.test_button);
         IDInputBox = findViewById(R.id.input_box);
 
-        // set up list values received from Attend app here
+        // set up list values received from Attend app
 
         RecyclerView recyclerView = findViewById(R.id.studentIDRecyclerview);
 
@@ -174,11 +181,12 @@ public class StudentSignInActivity extends MainActivity {
         }
 
         System.out.println(mostRecentIDsSignedIn.toString());
+
     }
 
     // creates a toast, inflates it, and sets the custom parameters for the
     // custom toast message
-    private void showCustomToast(String message, @DrawableRes int image) {
+    public void showCustomToast(String message, @DrawableRes int image) {
         Toast toast = new Toast(getApplicationContext());
         View view = getLayoutInflater().inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.viewContainer));
         toast.setView(view);
@@ -199,9 +207,4 @@ public class StudentSignInActivity extends MainActivity {
         super.onDestroy();
     }
 
-    @Override
-    public void onBackPressed() {
-        finish();
-        Log.d("StudentSignInActivity", "OnBackPressed is called");
-    }
 }

@@ -29,6 +29,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.LogRecord;
+/*
+    Written by Noah Johnson, Jocelyn Chen, Gary Wu, Elin Yang, and Laura Villarreal
+     for CS4485.0w1, senior design project, started February 11 2023
+    NetIDs: ntj200000, jpc180002, gyw200000, yxy190022, lmv180001
+ */
 
 public class BluetoothThread extends Thread {
     private BluetoothSocket bluetoothSocket;
@@ -39,12 +44,13 @@ public class BluetoothThread extends Thread {
     private InputStream inputStream;
     private OutputStream outputStream;
     private byte[] streamBuffer;
+    // empty byte array sent to the handler in case of an error
+    private byte[] errorBuffer = {};
     private Handler handler;
 
-    private interface MessageConstants {
+    public interface MessageConstants {
         public static final int MESSAGE_READ = 0;
-        public static final int MESSAGE_WRITE = 1;
-        public static final int MESSAGE_TOAST = 2;
+        public static final int CONNECT_ERROR = 1;
 
     }
 
@@ -141,6 +147,9 @@ public class BluetoothThread extends Thread {
 //                    readMsg.sendToTarget();
             } catch (IOException e) {
                 Log.d(TAG, "Input stream was disconnected", e);
+                Message readMsg = handler.obtainMessage(MessageConstants.CONNECT_ERROR, numBytes, -1, errorBuffer);
+                readMsg.setTarget(handler);
+                readMsg.sendToTarget();
                 break;
             }
 

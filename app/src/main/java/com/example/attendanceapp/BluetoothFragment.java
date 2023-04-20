@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,41 +26,75 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
+/*
+    Written by Noah Johnson, Jocelyn Chen, Gary Wu, Elin Yang, and Laura Villarreal
+     for CS4485.0w1, senior design project, started February 11 2023
+    NetIDs: ntj200000, jpc180002, gyw200000, yxy190022, lmv180001
+ */
+
 /**
- * A fragment representing a list of Items.
+ * Displays the list of possible devices to connect to,
+ * starts the thread to connect to the Attend application,
+ * redirects to the StudentSignInActivity
  */
 public class BluetoothFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
+
+    // holds the devices that are discoverable by the phone
     private static List<String> devices;
+
+    // acts as the bridge between the recyclerview and the data
     private static BluetoothAdapter mBluetoothAdapter;
 
+    // holds the list of student IDs grabbed from the thread
     private static ArrayList<String> idList = new ArrayList<>();
+
+    // thread that runs the bluetooth processes in the background
     public static BluetoothThread btThread;
 
+
+    /*
+    * takes the Message object from the bluetooth thread once it reads from the stream,
+    * populates the id list/cleans the data from the stream
+    * Handler expects the message to have ids of 10 characters separated by the newline character
+     */
     @SuppressLint("HandlerLeak")
-    public static final Handler handler = new Handler() {
+    public final Handler handler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
-            int beginIndex = -1;
-            int endIndex = 0;
-           // byte[] readBuf = (byte[]) msg.obj;
-            String readMessage = new String((byte []) msg.obj);
-            Log.d("readMessage", readMessage);
+            Log.d("Handler", "Inside handler");
+            Log.d("Handler", "msg.what = " + msg.what);
+            if(msg.what == BluetoothThread.MessageConstants.MESSAGE_READ) {
+                String readMessage = new String((byte []) msg.obj);
 
-            String[] result = readMessage.split("\\n");
-            for (int x=0; x<result.length; x++) {
-                System.out.println(result[x]);
-                if(result[x].length() == 10 && !idList.contains(result[x])) {
-                    Log.d("CorrectId", result[x]);
-                    idList.add(result[x]);
+                String[] result = readMessage.split("\\n");
+                for (int x=0; x<result.length; x++) {
+                    if(result[x].length() == 10 && !idList.contains(result[x])) {
+                        idList.add(result[x]);
+                    }
+                    else if(result[x].equals("*")) {
+                        Intent i = new Intent(getActivity(), StudentSignInActivity.class);
+
+                        i.putExtra("idList", idList.toArray());
+                        getActivity().startActivity(i);
+                    }
                 }
+            }
+            else if(msg.what == BluetoothThread.MessageConstants.CONNECT_ERROR) {
+                Log.d("ErrorMessage", "Inside error message handler");
+                showCustomToast(getString(R.string.broken_pipe_error_msg), R.drawable.baseline_cancel_24);
+
             }
 
         }
@@ -161,12 +196,6 @@ public class BluetoothFragment extends Fragment {
                             BluetoothThread thread = new BluetoothThread(testDevice, mBluetoothAdapter, handler);
                             btThread = thread;
                             thread.start();
-
-
-                            Intent i = new Intent(getActivity(), StudentSignInActivity.class);
-
-                            i.putExtra("idList", idList.toArray());
-                            getActivity().startActivity(i);
                         }
 
                         @Override public void onLongItemClick(View view, int position) {
@@ -186,5 +215,22 @@ public class BluetoothFragment extends Fragment {
 
     public static ArrayList<String> idListGetter() {
         return idList;
+    }
+
+    // creates a toast, inflates it, and sets the custom parameters for the
+    // custom toast message
+    public void showCustomToast(String message, @DrawableRes int image) {
+        Toast toast = new Toast(requireContext());
+        View view = getLayoutInflater().inflate(R.layout.custom_toast, (ViewGroup) requireView().findViewById(R.id.viewContainer));
+        toast.setView(view);
+
+        ImageView toastImage = (ImageView) view.findViewById((R.id.toastImage));
+        toastImage.setImageResource(image);
+
+        TextView toastMessage = view.findViewById(R.id.toastMessage);
+        toastMessage.setText(message);
+
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.show();
     }
 }
