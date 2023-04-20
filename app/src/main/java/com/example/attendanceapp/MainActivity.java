@@ -154,11 +154,6 @@ public class MainActivity extends AppCompatActivity {
 //        bluetoothUtils.discoverDevices(this, handler);
     }
 
-    private void sendID(String id) {
-        byte[] idMessage = id.getBytes();
-        bluetoothUtils.write(idMessage);
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

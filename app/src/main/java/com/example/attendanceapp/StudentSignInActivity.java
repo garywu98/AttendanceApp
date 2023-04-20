@@ -201,6 +201,16 @@ public class StudentSignInActivity extends MainActivity {
         toast.show();
     }
 
+    /**
+     * Cancelling the bluetooth connection between our app and the Attend Desktop app
+     */
+    @Override
+    public void onBackPressed()
+    {
+        btThread.cancel();
+        super.onBackPressed();
+    }
+
     @Override
     protected void onDestroy() {
         Log.d("StudentSignInActivity", "onDestroy is called");

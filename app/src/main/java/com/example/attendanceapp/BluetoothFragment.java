@@ -32,8 +32,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CountDownLatch;
 
 /*
     Written by Noah Johnson, Jocelyn Chen, Gary Wu, Elin Yang, and Laura Villarreal
@@ -64,17 +62,17 @@ public class BluetoothFragment extends Fragment {
     public static BluetoothThread btThread;
 
 
-    /*
+    /**
     * takes the Message object from the bluetooth thread once it reads from the stream,
-    * populates the id list/cleans the data from the stream
+    * populates the id list/cleans the data from the stream if the flag is MESSAGE_READ
     * Handler expects the message to have ids of 10 characters separated by the newline character
+    * Begins the sign in activity once an asterisk is read
+    * If the flag is CONNECT_ERROR, it displays a custom toast notifying the user of a broken pipe error
      */
     @SuppressLint("HandlerLeak")
     public final Handler handler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
-            Log.d("Handler", "Inside handler");
-            Log.d("Handler", "msg.what = " + msg.what);
             if(msg.what == BluetoothThread.MessageConstants.MESSAGE_READ) {
                 String readMessage = new String((byte []) msg.obj);
 
@@ -85,18 +83,13 @@ public class BluetoothFragment extends Fragment {
                     }
                     else if(result[x].equals("*")) {
                         Intent i = new Intent(getActivity(), StudentSignInActivity.class);
-
-                        i.putExtra("idList", idList.toArray());
                         getActivity().startActivity(i);
                     }
                 }
             }
             else if(msg.what == BluetoothThread.MessageConstants.CONNECT_ERROR) {
-                Log.d("ErrorMessage", "Inside error message handler");
                 showCustomToast(getString(R.string.broken_pipe_error_msg), R.drawable.baseline_cancel_24);
-
             }
-
         }
     };
 
@@ -104,12 +97,25 @@ public class BluetoothFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public BluetoothFragment(List<String> devices, BluetoothAdapter mBluetoothAdapter) {
-        this.devices = devices;
-        this.mBluetoothAdapter = mBluetoothAdapter;
+    public BluetoothFragment() {
+
     }
 
-    // TODO: Customize parameter initialization
+    /**
+     * Overlaoded constructor
+     * @param devices - list of devices found by the adapter
+     * @param mBluetoothAdapter
+     */
+    public BluetoothFragment(List<String> devices, BluetoothAdapter mBluetoothAdapter) {
+        BluetoothFragment.devices = devices;
+        BluetoothFragment.mBluetoothAdapter = mBluetoothAdapter;
+    }
+
+    /**
+     * creates a new instance of the bluetooth fragment
+     * @param columnCount - number of columns that the recyclerview will have in its display
+     * @return newly created fragment instance
+     */
     @SuppressWarnings("unused")
     public static BluetoothFragment newInstance(int columnCount) {
         BluetoothFragment fragment = new BluetoothFragment(devices, mBluetoothAdapter);
@@ -119,27 +125,41 @@ public class BluetoothFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * setting up the fragment
+     * @param savedInstanceState If the fragment is being re-created from
+     * a previous saved state, this is the state.
+     *
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // setting the number of columns for the recyclerview
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+
         // create an action bar that will have a back button
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         assert actionBar != null;
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
-    /*
-    Sets up the menu bar for the fragment
+    /**
+     * Sets up the menu bar for the fragment
      */
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_bluetooth_discovery, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /**
+     * setting up behavior for the back button on the actionbar
+     * @param item The menu item that was selected.
+     *
+     * @return
+     */
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             // moves back to the main activity
@@ -149,19 +169,28 @@ public class BluetoothFragment extends Fragment {
                 // pops every fragment off the stack to get back to the main page
                 while(fm.getBackStackEntryCount() > 0) {
                     fm.popBackStackImmediate();
+
                     // set the action bar back to its original values from the main activity
                     if(fm.getBackStackEntryCount() == 1) {
                         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+                        // remove the back button from the actionbar
                         actionBar.setDisplayHomeAsUpEnabled(false);
                         requireActivity().setTitle(getString(R.string.app_name));
                     }
-                    Log.d("fragmentPop", String.valueOf(fm.getBackStackEntryCount()));
                 }
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+
+    /**
+     * removing the icons from the actionbar on the main activity
+     * so they cannot be pressed when the fragment is open
+     * @param menu The options menu as last shown or first initialized by
+     *             onCreateOptionsMenu().
+     *
+     */
     public void onPrepareOptionsMenu(Menu menu) {
         MenuItem devices_item = menu.findItem(R.id.menu_search_devices);
         devices_item.setVisible(false);
@@ -171,6 +200,19 @@ public class BluetoothFragment extends Fragment {
     }
 
 
+    /**
+     * sets up the recyclerview and its behaviors when it is created
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -182,24 +224,30 @@ public class BluetoothFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
+            // sets the layout based on the number of columns provided to the recyclerview
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
+
+            // have each item in the recyclerview react to a press
             recyclerView.addOnItemTouchListener(
                     new RecyclerItemClickListener(context, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
                         @Override public void onItemClick(View view, int position) {
                             String address = devices.get(position).split("\n")[1];
                             System.out.println(address);
+                            // grabbing the device information that was pressed
                             BluetoothDevice testDevice = mBluetoothAdapter.getRemoteDevice(address);
+
+                            // starting the thread to start connection with the computer and the Attend application
                             BluetoothThread thread = new BluetoothThread(testDevice, mBluetoothAdapter, handler);
                             btThread = thread;
                             thread.start();
                         }
 
                         @Override public void onLongItemClick(View view, int position) {
-                            // do whatever
+                            // nothing will happen if the user long clicks
                         }
                     })
             );
@@ -217,12 +265,19 @@ public class BluetoothFragment extends Fragment {
         return idList;
     }
 
-    // creates a toast, inflates it, and sets the custom parameters for the
-    // custom toast message
+    /**
+     * creates a toast, inflates it, and sets the custom parameters for the
+     * custom toast message
+     * @param message - message that will be displayed in the toast
+     * @param image - image that will be displayed in the toast
+     */
     public void showCustomToast(String message, @DrawableRes int image) {
         Toast toast = new Toast(requireContext());
+        // grab the current page that the function is being called from
         View view = getLayoutInflater().inflate(R.layout.custom_toast, (ViewGroup) requireView().findViewById(R.id.viewContainer));
         toast.setView(view);
+
+        // set message and image to the toast
 
         ImageView toastImage = (ImageView) view.findViewById((R.id.toastImage));
         toastImage.setImageResource(image);
