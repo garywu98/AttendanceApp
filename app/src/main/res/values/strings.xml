@@ -17,4 +17,7 @@
     <string name="bluetooth_fragment_title">Devices</string>
     <string name="label_number_of_students_signed_in">Number of Students Signed in</string>
     <string name="numStudentsSignedIn">%1$d of %2$d</string>
+    <string name="broken_pipe_error_msg">Data can\'t be read. Please restart the Attend Desktop app and try again</string>
+    <string name="already_signed_in">You have already been signed in</string>
+    <string name="not_found_in_class_list_provided">Not found in the list, please speak with the professor</string>
 </resources>

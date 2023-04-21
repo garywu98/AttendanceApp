@@ -1,16 +1,21 @@
 package com.example.attendanceapp;
 
 import android.content.Context;
-//import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.lang.reflect.InvocationTargetException;
 
+/*
+    Written by Noah Johnson, Jocelyn Chen, Gary Wu, Elin Yang, and Laura Villarreal
+     for CS4485.0w1, senior design project, started February 11 2023
+    NetIDs: ntj200000, jpc180002, gyw200000, yxy190022, lmv180001
+ */
 
+/**
+ * used by BlueToothFragment to listen for a click when user taps on a device
+ */
 public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
     private OnItemClickListener mListener;
 
@@ -22,6 +27,12 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
 
     GestureDetector mGestureDetector;
 
+    /**
+     * listens for a click on the recyclerview
+     * @param context
+     * @param recyclerView
+     * @param listener
+     */
     public RecyclerItemClickListener(Context context, final RecyclerView recyclerView, OnItemClickListener listener) {
         mListener = listener;
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
@@ -40,6 +51,13 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
         });
     }
 
+    /**
+     * when a click happens, get the position of the item in the list
+     * @param view
+     * @param e MotionEvent describing the touch event. All coordinates are in
+     *          the RecyclerView's coordinate system.
+     * @return
+     */
     @Override public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
         View childView = view.findChildViewUnder(e.getX(), e.getY());
         if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {

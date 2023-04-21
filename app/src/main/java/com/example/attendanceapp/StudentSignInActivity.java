@@ -1,17 +1,13 @@
 package com.example.attendanceapp;
 
 import androidx.annotation.DrawableRes;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +16,21 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/*
+    Written by Noah Johnson, Jocelyn Chen, Gary Wu, Elin Yang, and Laura Villarreal
+     for CS4485.0w1, senior design project, started February 11 2023
+    NetIDs: ntj200000, jpc180002, gyw200000, yxy190022, lmv180001
+ */
+
+/**
+ * displays number of students signed in during the session out of total students in class
+ * reads in card ID from card scanner and validates the student is in the class list
+ * sends data to the Attend app if ID is found
+ * handles the behaviour of the StudentInfoRecyclerView by displaying 5 most recent sign ins
+ */
 public class StudentSignInActivity extends MainActivity {
 
     ArrayList<String> mostRecentIDsSignedIn = new ArrayList<>();
@@ -35,34 +42,39 @@ public class StudentSignInActivity extends MainActivity {
     String[] idList = {};
     ArrayList<String> signedInList = new ArrayList<>();
     BluetoothThread btThread;
-    int totalStudents = idList.length;
-    int numSignedIn = 0;
 
-
-
+    /**
+     * gets the student class id list data collected by the bluetooth thread
+     * sets up the number of students signed in
+     * listens to card scans
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_sign_in);
 
-//        idList = getIntent().getExtras().getStringArray("idList");
-//        btThread = (BluetoothThread) getIntent().getExtras().getSerializable("thread");
         btThread = BluetoothFragment.threadGetter();
 
         numStudentSignedIn = findViewById(R.id.numStudentsSignedIn);
         formattedString = numStudentSignedIn.getText().toString();
 
-        numStudentSignedIn.setText("—");
-
+        // setting the number of students signed in to reflect the total number of students in the class
+        String newFormattedString;
+        Log.d("IDList", "IDList instantiated to 0 for the first time");
+        idList = BluetoothFragment.idListGetter().toArray(new String[0]);
+        newFormattedString = String.format(formattedString, signInStudents, idList.length);
+        numStudentSignedIn.setText(newFormattedString);
 
         // invalidate action bar inherited from main activity
         this.invalidateOptionsMenu();
 
-//        testButton = findViewById(R.id.test_button);
         IDInputBox = findViewById(R.id.input_box);
 
-        // set up list values received from Attend app here
-
+        // set up list values received from Attend app
         RecyclerView recyclerView = findViewById(R.id.studentIDRecyclerview);
 
         StudentInfoRecyclerViewAdapter adapter = new StudentInfoRecyclerViewAdapter(mostRecentIDsSignedIn);
@@ -91,14 +103,27 @@ public class StudentSignInActivity extends MainActivity {
     }
 
 
-    // hides the devices button and bluetooth button from the action bar
-    // when we reach the sign in page
+
+
+    /**
+     * hides the devices button and bluetooth button from the action bar when we reach the sign in page
+     * @param menu The options menu in which you place your items.
+     *
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_student_sign_in, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
+    /**
+     * hiding the search devices and bluetooth activation button
+     * @param menu The options menu as last shown or first initialized by
+     *             onCreateOptionsMenu().
+     *
+     * @return
+     */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem devices_item = menu.findItem(R.id.menu_search_devices);
@@ -109,8 +134,13 @@ public class StudentSignInActivity extends MainActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-    // compares ID inputted with IDs from Attend app, sends confirmation, and adds
-    // value to most recent list of signed in students
+    /**
+     * compares ID inputted with IDs from Attend app
+     * sends ID to Attend desktop app if ID is validated
+     * adds value to most recent list of signed in students
+     * @param view
+     * @param adapter
+     */
     private void validateIDFromTextBox(View view, StudentInfoRecyclerViewAdapter adapter) {
         String newFormattedString;
         cardInfo = IDInputBox.getText().toString();
@@ -121,19 +151,21 @@ public class StudentSignInActivity extends MainActivity {
 
         boolean isFound = false;
         boolean isDuplicate = false;
-        idList = BluetoothFragment.idListGetter().toArray(new String[0]);
-        Log.d("StudentSignInActivity", Arrays.toString(idList));
+
         newFormattedString = String.format(formattedString, signInStudents, idList.length);
         numStudentSignedIn.setText(newFormattedString);
 
         String idShort = "";
 
+        //check if scanned ID is in the list of IDs provided from the Attend desktop app
         for(String id : idList) {
+            //checks if the scanned ID has already been signed in
             if(signedInList.contains(cardInfo)){
                 isDuplicate = true;
                 break;
             }
 
+            //checks if an ID provided by the Attend desktop app contains the scanned in ID
             if(cardInfo.contains(id)) {
                 signedInList.add(cardInfo);
                 idShort = id;
@@ -142,19 +174,25 @@ public class StudentSignInActivity extends MainActivity {
             }
         }
 
+        //if the ID has been found in the list
         if(isFound) {
             signInStudents++;
             newFormattedString = String.format(formattedString, signInStudents, idList.length);
             numStudentSignedIn.setText(newFormattedString);
+
+
             showCustomToast("You have been signed in", R.drawable.baseline_check_circle_24);
-//            Toast.makeText(this, "You have been signed in", Toast.LENGTH_SHORT).show();
+
             // add id to the arraylist
             if (mostRecentIDsSignedIn.size() < 5) {
                 mostRecentIDsSignedIn.add(0, idShort);
                 adapter.notifyItemInserted(0);
             } else if (mostRecentIDsSignedIn.size() == 5) {
+                //remove the oldest ID in the list
                 mostRecentIDsSignedIn.remove(mostRecentIDsSignedIn.size() - 1);
                 adapter.notifyItemRemoved(mostRecentIDsSignedIn.size());
+
+                //add the new ID
                 mostRecentIDsSignedIn.add(0, idShort);
                 adapter.notifyItemInserted(0);
             }
@@ -162,23 +200,27 @@ public class StudentSignInActivity extends MainActivity {
             //write card info to thread
             btThread.write(cardInfo.getBytes());
 
+            //play a verification sound to the user
             mp.start();
         }
         else if(isDuplicate) {
-            showCustomToast("You have already been signed in", R.drawable.baseline_cancel_24);
-//            Toast.makeText(this, "You have already been signed in", Toast.LENGTH_SHORT).show();
+            showCustomToast(getString(R.string.already_signed_in), R.drawable.baseline_cancel_24);
         }
         else {
-            showCustomToast("Not found in the list, please speak with the professor", R.drawable.baseline_cancel_24);
-//            Toast.makeText(this, "Not found in the list, please speak with the professor", Toast.LENGTH_SHORT).show();
+            //if student is not found in the class list
+            showCustomToast(getString(R.string.not_found_in_class_list_provided), R.drawable.baseline_cancel_24);
         }
-
-        System.out.println(mostRecentIDsSignedIn.toString());
     }
 
-    // creates a toast, inflates it, and sets the custom parameters for the
-    // custom toast message
-    private void showCustomToast(String message, @DrawableRes int image) {
+
+
+    /**
+     * creates a toast, inflates it, and sets the custom parameters for the
+     * custom toast message
+     * @param message
+     * @param image
+     */
+    public void showCustomToast(String message, @DrawableRes int image) {
         Toast toast = new Toast(getApplicationContext());
         View view = getLayoutInflater().inflate(R.layout.custom_toast, (ViewGroup) findViewById(R.id.viewContainer));
         toast.setView(view);
@@ -193,15 +235,19 @@ public class StudentSignInActivity extends MainActivity {
         toast.show();
     }
 
+    /**
+     * Cancelling the bluetooth connection between our app and the Attend Desktop app
+     */
     @Override
-    protected void onDestroy() {
-        Log.d("StudentSignInActivity", "onDestroy is called");
-        super.onDestroy();
+    public void onBackPressed()
+    {
+        btThread.cancel();
+        super.onBackPressed();
     }
 
     @Override
-    public void onBackPressed() {
-        finish();
-        Log.d("StudentSignInActivity", "OnBackPressed is called");
+    protected void onDestroy() {
+        super.onDestroy();
     }
+
 }
